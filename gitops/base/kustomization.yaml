@@ -13,3 +13,5 @@ resources:
   - ./pipeline/09_task-image-scan.yaml
   - ./pipeline/10_task-gitea-set-status.yaml
   - ./pipeline/11_pipeline-clone-build-push.yaml
+
+  - ./vault/hashicorp.yaml
