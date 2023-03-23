@@ -1,8 +1,9 @@
 ---
 apiVersion: tekton.dev/v1beta1
-kind: ClusterTask
+kind: Task
 metadata:
   name: stackrox-image-check
+  namespace: cicd-devsec-ops
   labels:
     app.kubernetes.io/version: "0.1"
   annotations:
