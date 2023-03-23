@@ -1,0 +1,197 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: gitea-http
+  namespace: gitea
+  labels:
+    app: gitea-demo
+spec:
+  clusterIP:
+  ports:
+  - name: gitea-http
+    port: 3000
+    protocol: TCP
+  selector:
+    app: gitea-demo
+  type: LoadBalancer
+---
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: gitea-pvc
+  namespace: gitea
+spec:
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: ocs-storagecluster-ceph-rbd
+  resources:
+    requests:
+      storage: 40Gi
+  volumeMode: Filesystem
+---
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: trusted-ca
+  namespace: gitea
+  labels:
+    config.openshift.io/inject-trusted-cabundle: 'true'
+---
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: gitea-config
+  namespace: gitea
+data:
+  app-ini: |
+    RUN_USER = gitea
+    RUN_MODE = prod
+
+    [repository]
+    ROOT = /usr/local/gitea/git
+    SCRIPT_TYPE = sh
+    DEFAULT_BRANCH = main
+    DEFAULT_PUSH_CREATE_PRIVATE = true
+    ENABLE_PUSH_CREATE_USER = true
+    ENABLE_PUSH_CREATE_ORG = true
+
+    [server]
+    ROOT_URL = https://gitea-gitea.apps.ocp1.redhat.hpecic.net
+    HTTP_PORT = 3000
+    STATIC_ROOT_PATH = /usr/local/gitea/web
+    APP_DATA_PATH    = /usr/local/gitea/data
+    LFS_START_SERVER = true
+
+    [service]
+    DISABLE_REGISTRATION = true
+
+    [database]
+    DB_TYPE = sqlite3
+    PATH = /usr/local/gitea/db/gitea.db
+
+    [security]
+    INSTALL_LOCK = true
+    SECRET_KEY = ${SECRET_KEY}
+    INTERNAL_TOKEN = ${INTERNAL_TOKEN}
+
+    [oauth2]
+    JWT_SECRET = ${JWT_SECRET}
+
+    [session]
+    PROVIDER = file
+
+    [log]
+    ROOT_PATH = /usr/local/gitea/log
+    MODE = file
+    LEVEL = Info
+
+    [webhook]
+    ALLOWED_HOST_LIST = *
+    SKIP_TLS_VERIFY = true
+  gitea-config-sh: |
+    function configGitea() {
+      if [[ ! -f /usr/local/gitea/installed ]]
+      then
+        for i in bin etc custom data db git
+        do
+          rm -rf /usr/local/gitea/${i}
+          mkdir /usr/local/gitea/${i}
+        done
+        
+        echo "export INTERNAL_TOKEN=$(gitea generate secret INTERNAL_TOKEN)" > /usr/local/gitea/set_tokens.sh
+        echo "export SECRET_KEY=$(gitea generate secret SECRET_KEY)" >> /usr/local/gitea/set_tokens.sh
+        echo "export JWT_SECRET=$(gitea generate secret JWT_SECRET)" >> /usr/local/gitea/set_tokens.sh
+        . /usr/local/gitea/set_tokens.sh
+        envsubst < /gitea/app.ini > /usr/local/gitea/etc/app.ini
+
+        gitea --config /usr/local/gitea/etc/app.ini migrate
+        gitea --config /usr/local/gitea/etc/app.ini admin user create --admin --username gitea --password redhat123 --email gitea@gitea.crc.testing 
+        gitea --config /usr/local/gitea/etc/app.ini admin user create --username developer --password redhat123 --email developer@gitea.crc.testing
+        touch /usr/local/gitea/installed
+      else
+        . /usr/local/gitea/set_tokens.sh
+        envsubst < /gitea/app.ini > /usr/local/gitea/etc/app.ini
+      fi
+    }
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    description: gitea-demo Deployment.
+  labels:
+    app: gitea-demo
+  name: gitea-demo
+  namespace: gitea
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: "gitea-demo"
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: "gitea-demo"
+      name: gitea-demo
+    spec:
+      securityContext:
+        runAsUser: 65536
+      serviceAccount: pipeline
+      terminationGracePeriodSeconds: 60
+      containers:
+      - image: quay.io/cgruver0/gitea-demo:latest
+        imagePullPolicy: Always
+        name: gitea-demo
+        ports:
+        - containerPort: 3000
+          name: gitea-http
+          protocol: TCP
+        - containerPort: 2222
+          name: gitea-ssh
+          protocol: TCP
+        volumeMounts:
+        - mountPath: /usr/local/gitea
+          name: gitea-storage
+        - mountPath: /gitea
+          name: gitea-config
+        - mountPath: /etc/pki/ca-trust/extracted/pem
+          name: trusted-ca
+          readOnly: true
+        readinessProbe:
+          failureThreshold: 3
+          httpGet:
+            path: /
+            port: 3000
+            scheme: HTTP
+          periodSeconds: 20
+          successThreshold: 1
+          timeoutSeconds: 1
+        livenessProbe:
+          failureThreshold: 10
+          httpGet:
+            path: /
+            port: 3000
+            scheme: HTTP
+          periodSeconds: 20
+          successThreshold: 1
+          timeoutSeconds: 1
+      volumes:
+      - name: gitea-storage
+        persistentVolumeClaim:
+          claimName: gitea-pvc
+      - name: gitea-config
+        configMap:
+          name: gitea-config
+          items:
+          - key: app-ini
+            path: app.ini
+          - key: gitea-config-sh
+            path: gitea-config.sh
+      - name: trusted-ca
+        configMap:
+          name: trusted-ca
+          items:
+            - key: ca-bundle.crt 
+              path: tls-ca-bundle.pem

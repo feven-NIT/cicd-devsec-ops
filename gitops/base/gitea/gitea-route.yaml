@@ -1,0 +1,15 @@
+apiVersion: route.openshift.io/v1
+kind: Route
+metadata:
+  name: gitea
+  namespace: gitea
+spec:
+  port:
+    targetPort: gitea-http
+  tls:
+    termination: edge
+  to:
+    kind: Service
+    name: gitea-http
+    weight: 100
+  wildcardPolicy: None

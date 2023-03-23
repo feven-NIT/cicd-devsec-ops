@@ -15,3 +15,8 @@ resources:
   - ./pipeline/11_pipeline-clone-build-push.yaml
 
   - ./vault/hashicorp.yaml
+
+  - ./gitea/gitea-interceptor.yaml
+  - ./gitea/gitea-route.yaml
+  - ./gitea/gitea-server.yaml
+
