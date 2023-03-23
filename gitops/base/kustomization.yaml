@@ -1,0 +1,15 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+  - ./pipeline/00_pvc-tekton-pvc.yaml
+  - ./pipeline/01_eventlistener.yaml
+  - ./pipeline/02_trigger-template.yaml
+  - ./pipeline/03_triggerbinding-app-demo.yaml
+  - ./pipeline/04_task-fetch-source.yaml
+  - ./pipeline/05_task-maven-run.yaml
+  - ./pipeline/06_task-build-push.yaml
+  - ./pipeline/07_task-sign-image.yaml
+  - ./pipeline/08_task-image-check.yaml
+  - ./pipeline/09_task-image-scan.yaml
+  - ./pipeline/10_task-gitea-set-status.yaml
+  - ./pipeline/11_pipeline-clone-build-push.yaml

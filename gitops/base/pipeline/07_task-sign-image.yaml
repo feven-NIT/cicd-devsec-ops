@@ -1,0 +1,49 @@
+apiVersion: tekton.dev/v1beta1
+kind: Task
+metadata:
+  annotations:
+    tekton.dev/pipelines.minVersion: 0.12.1
+  name: cosign
+  labels:
+    app.kubernetes.io/version: 0.1.0
+spec:
+  description: >-
+    These tasks make it possible to use cosign within your Tekton pipelines
+    cosign is a tool for signing and verifying software artifacts.
+  params:
+    - name: image
+      type: string
+  steps:
+    - name: sign
+      image: quay.io/feven/cosign-image:latest
+      command:
+      - /bin/bash
+      - -c
+      args:
+      - |
+        # Load the Cosign secret
+        #cosign login -u $(jq -r '.auths."quay.io".auth' /regcred/.dockerconfigjson | base64 -d | cut -d: -f1) -p $(jq -r '.auths."quay.io".auth' /regcred/.dockerconfigjson | base64 -d | cut -d: -f2) quay.io
+
+        # Load the registry credentials
+        podman login -u $(jq -r '.auths."quay.io".auth' /regcred/.dockerconfigjson | base64 -d | cut -d: -f1) -p $(jq -r '.auths."quay.io".auth' /regcred/.dockerconfigjson | base64 -d | cut -d: -f2) quay.io/feven
+
+        # Sign the image
+        cosign sign --key  k8s://cicd-devsec-ops/cosign $(params.image) -y
+
+      env:
+      - name: image
+        value: $(params.image)
+      volumeMounts:
+      - name: cosign-secret
+        mountPath: /cosign-secret
+        readOnly: true
+      - name: regcred
+        mountPath: /regcred
+        readOnly: true
+  volumes:
+    - name: cosign-secret
+      secret:
+        secretName: cosign
+    - name: regcred
+      secret:
+        secretName: regcred

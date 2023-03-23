@@ -1,0 +1,50 @@
+apiVersion: triggers.tekton.dev/v1beta1
+kind: TriggerTemplate
+metadata:
+  annotations:
+    triggers.tekton.dev/old-escape-quotes: "true"
+  name: cicd-devsec-ops
+  namespace: cicd-devsec-ops
+spec:
+  params:
+  - default: main
+    description: The git SHA to checkout
+    name: git-checkout-sha
+  - description: The git repository url
+    name: git-repo-url
+  - description: The SHA256 signature of the payload
+    name: git-signature
+  - description: The git event that caused the webhook to fire
+    name: git-event
+  - description: The trigger payload
+    name: trigger-payload
+  - description: number of the PR
+    name: pr-number
+  resourcetemplates:
+  - apiVersion: tekton.dev/v1beta1
+    kind: PipelineRun
+    metadata:
+      generateName: cicd-devsec-ops-
+      labels:
+        app-name: cicd-devsec-ops
+    spec:
+      params:
+        - name: repo-url
+          #value: https://gitea-gitea.apps.ocp1.redhat.hpecic.net/demo/cicd-devsec-ops.git          
+          value: $(tt.params.git-repo-url)
+        - name: image-reference
+          value: quay.io/feven/cicd-e2e
+        - name: dockerpath
+          value: src/main/docker/Dockerfile.jvm
+        - name: pr-number
+          value: $(tt.params.pr-number)
+      pipelineRef:
+        name: clone-build-push
+      serviceAccountName: pipeline
+      timeout: 1h0m0s
+      workspaces:
+        - name: shared-data
+          persistentVolumeClaim:
+            claimName: tekton-pvc
+        - emptyDir: {} 
+          name: maven-settings

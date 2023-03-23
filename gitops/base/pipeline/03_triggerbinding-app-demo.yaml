@@ -1,0 +1,13 @@
+apiVersion: triggers.tekton.dev/v1beta1
+kind: TriggerBinding
+metadata:
+  name: cicd-devsec-ops
+  namespace: cicd-devsec-ops
+spec:
+  params:
+  # - name: git-checkout-sha
+  #   value: $(body.after)
+  - name: pr-number
+    value: $(body.issue.number)
+  - name: git-repo-url
+    value: $(body.repository.clone_url)
