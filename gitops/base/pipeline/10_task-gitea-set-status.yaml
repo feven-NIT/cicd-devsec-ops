@@ -1,7 +1,8 @@
 apiVersion: tekton.dev/v1beta1
-kind: ClusterTask
+kind: Task
 metadata:
-  name: validated-pr
+  name: set-gitea-status
+  namespace: cicd-devsec-ops
 spec:
   stepTemplate:
     volumeMounts:
