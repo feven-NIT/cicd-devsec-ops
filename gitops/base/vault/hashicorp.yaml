@@ -6,12 +6,12 @@ metadata:
   name: vault-agent-injector
   labels:
     app.kubernetes.io/name: vault-agent-injector
-    app.kubernetes.io/instance: vault
+    app.kubernetes.io/instance: cicd-devsec-ops
 spec:
   podSelector:
     matchLabels:
       app.kubernetes.io/name: vault-agent-injector
-      app.kubernetes.io/instance: vault
+      app.kubernetes.io/instance: cicd-devsec-ops
       component: webhook
   ingress:
     - from:
@@ -28,7 +28,7 @@ metadata:
   namespace: default
   labels:
     app.kubernetes.io/name: vault-agent-injector
-    app.kubernetes.io/instance: vault
+    app.kubernetes.io/instance: cicd-devsec-ops
     app.kubernetes.io/managed-by: Helm
 ---
 # Source: vault/templates/server-serviceaccount.yaml
@@ -40,7 +40,7 @@ metadata:
   labels:
     helm.sh/chart: vault-0.23.0
     app.kubernetes.io/name: vault
-    app.kubernetes.io/instance: vault
+    app.kubernetes.io/instance: cicd-devsec-ops
     app.kubernetes.io/managed-by: Helm
 ---
 # Source: vault/templates/injector-clusterrole.yaml
@@ -50,7 +50,7 @@ metadata:
   name: vault-agent-injector-clusterrole
   labels:
     app.kubernetes.io/name: vault-agent-injector
-    app.kubernetes.io/instance: vault
+    app.kubernetes.io/instance: cicd-devsec-ops
     app.kubernetes.io/managed-by: Helm
 rules:
 - apiGroups: ["admissionregistration.k8s.io"]
@@ -68,7 +68,7 @@ metadata:
   name: vault-agent-injector-binding
   labels:
     app.kubernetes.io/name: vault-agent-injector
-    app.kubernetes.io/instance: vault
+    app.kubernetes.io/instance: cicd-devsec-ops
     app.kubernetes.io/managed-by: Helm
 roleRef:
   apiGroup: rbac.authorization.k8s.io
@@ -87,7 +87,7 @@ metadata:
   labels:
     helm.sh/chart: vault-0.23.0
     app.kubernetes.io/name: vault
-    app.kubernetes.io/instance: vault
+    app.kubernetes.io/instance: cicd-devsec-ops
     app.kubernetes.io/managed-by: Helm
 roleRef:
   apiGroup: rbac.authorization.k8s.io
@@ -106,7 +106,7 @@ metadata:
   namespace: default
   labels:
     app.kubernetes.io/name: vault-agent-injector
-    app.kubernetes.io/instance: vault
+    app.kubernetes.io/instance: cicd-devsec-ops
     app.kubernetes.io/managed-by: Helm
   
 spec:
@@ -116,7 +116,7 @@ spec:
     targetPort: 8080
   selector:
     app.kubernetes.io/name: vault-agent-injector
-    app.kubernetes.io/instance: vault
+    app.kubernetes.io/instance: cicd-devsec-ops
     component: webhook
 ---
 # Source: vault/templates/server-headless-service.yaml
@@ -129,7 +129,7 @@ metadata:
   labels:
     helm.sh/chart: vault-0.23.0
     app.kubernetes.io/name: vault
-    app.kubernetes.io/instance: vault
+    app.kubernetes.io/instance: cicd-devsec-ops
     app.kubernetes.io/managed-by: Helm
     vault-internal: "true"
   annotations:
@@ -146,7 +146,7 @@ spec:
       targetPort: 8201
   selector:
     app.kubernetes.io/name: vault
-    app.kubernetes.io/instance: vault
+    app.kubernetes.io/instance: cicd-devsec-ops
     component: server
 ---
 # Source: vault/templates/server-service.yaml
@@ -159,7 +159,7 @@ metadata:
   labels:
     helm.sh/chart: vault-0.23.0
     app.kubernetes.io/name: vault
-    app.kubernetes.io/instance: vault
+    app.kubernetes.io/instance: cicd-devsec-ops
     app.kubernetes.io/managed-by: Helm
   annotations:
 
@@ -176,7 +176,7 @@ spec:
       targetPort: 8201
   selector:
     app.kubernetes.io/name: vault
-    app.kubernetes.io/instance: vault
+    app.kubernetes.io/instance: cicd-devsec-ops
     component: server
 ---
 # Source: vault/templates/injector-deployment.yaml
@@ -188,7 +188,7 @@ metadata:
   namespace: default
   labels:
     app.kubernetes.io/name: vault-agent-injector
-    app.kubernetes.io/instance: vault
+    app.kubernetes.io/instance: cicd-devsec-ops
     app.kubernetes.io/managed-by: Helm
     component: webhook
 spec:
@@ -196,14 +196,14 @@ spec:
   selector:
     matchLabels:
       app.kubernetes.io/name: vault-agent-injector
-      app.kubernetes.io/instance: vault
+      app.kubernetes.io/instance: cicd-devsec-ops
       component: webhook
   
   template:
     metadata:
       labels:
         app.kubernetes.io/name: vault-agent-injector
-        app.kubernetes.io/instance: vault
+        app.kubernetes.io/instance: cicd-devsec-ops
         component: webhook
     spec:
       
@@ -298,7 +298,7 @@ metadata:
   namespace: default
   labels:
     app.kubernetes.io/name: vault
-    app.kubernetes.io/instance: vault
+    app.kubernetes.io/instance: cicd-devsec-ops
     app.kubernetes.io/managed-by: Helm
 spec:
   serviceName: vault-internal
@@ -309,14 +309,14 @@ spec:
   selector:
     matchLabels:
       app.kubernetes.io/name: vault
-      app.kubernetes.io/instance: vault
+      app.kubernetes.io/instance: cicd-devsec-ops
       component: server
   template:
     metadata:
       labels:
         helm.sh/chart: vault-0.23.0
         app.kubernetes.io/name: vault
-        app.kubernetes.io/instance: vault
+        app.kubernetes.io/instance: cicd-devsec-ops
         component: server
     spec:
       
@@ -432,7 +432,7 @@ metadata:
   namespace: default
   labels:
     app.kubernetes.io/name: vault-agent-injector
-    app.kubernetes.io/instance: vault
+    app.kubernetes.io/instance: cicd-devsec-ops
     app.kubernetes.io/managed-by: Helm
 webhooks:
   - name: vault.hashicorp.com
