@@ -6,7 +6,6 @@ metadata:
   labels:
     app: gitea-demo
 spec:
-  clusterIP:
   ports:
   - name: gitea-http
     port: 3000
