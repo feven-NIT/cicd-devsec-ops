@@ -16,6 +16,8 @@ resources:
   - ./pipeline/12_task-gitea-set-status.yaml
   - ./pipeline/99_pipeline-clone-build-push.yaml
 
+  - ./secret/githook.yaml
+
   #- ./vault/hashicorp.yaml
 
   - ./gitea/gitea-interceptor.yaml
