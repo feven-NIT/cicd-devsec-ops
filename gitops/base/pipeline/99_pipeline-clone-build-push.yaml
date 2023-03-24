@@ -106,7 +106,7 @@ spec:
         - sign-image
       taskRef:
         name: stackrox-image-check
-        kind: ClusterTask
+        kind: Task
       params:
         - name: image
           value: $(params.image-reference)
@@ -119,7 +119,7 @@ spec:
         - image-check
       taskRef:
         name: stackrox-image-scan
-        kind: ClusterTask
+        kind: Task
       params:
         - name: image
           value: $(params.image-reference)
