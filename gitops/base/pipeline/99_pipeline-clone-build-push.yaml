@@ -310,4 +310,4 @@ spec:
         name: gitea-set-status
   workspaces:
     - name: tekton-pvc
-      optionnal: false
+      optional: false
