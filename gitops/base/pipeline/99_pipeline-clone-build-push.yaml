@@ -71,7 +71,7 @@ spec:
       workspaces:
         - name: source
           workspace: tekton-pvc
-    - name: s2i-python
+    - name: s2i
       params:
         - name: VERSION
           value: latest
@@ -83,12 +83,12 @@ spec:
           value: '$(params.IMAGE_REPO)/$(params.GIT_REPO_NAME):$(params.GIT_REVISION)'
         - name: BUILDER_IMAGE
           value: >-
-            registry.redhat.io/rhel8/buildah@sha256:ac0b8714cc260c94435cab46fe41b3de0ccbc3d93e38c395fa9d52ac49e521fe
+            image-registry.openshift-image-registry.svc:5000/openshift/python:3.9-ubi8
       runAfter:
         - pytest
       taskRef:
         kind: Task
-        name: s2i-python-with-scc
+        name: s2i
       workspaces:
         - name: source
           workspace: tekton-pvc
@@ -97,7 +97,7 @@ spec:
         - name: image
           value: $(params.image-reference)
       runAfter:
-        - s2i-python
+        - s2i
       taskRef:
         kind: Task
         name: cosign
@@ -310,4 +310,3 @@ spec:
         name: gitea-set-status
   workspaces:
     - name: tekton-pvc
-      optional: false
