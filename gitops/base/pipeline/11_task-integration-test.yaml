@@ -1,0 +1,27 @@
+apiVersion: tekton.dev/v1beta1
+kind: Task
+metadata:
+  name: curl
+spec:
+  params:
+    - name: URL
+      type: string
+  steps:
+    - image: >-
+        registry.access.redhat.com/ubi8/ubi:8.7-1054.1675788412
+      name: bash
+      script: |
+        #! bin/bash
+        set -e
+        echo "curl -s -o /dev/null -w "%{http_code}" $(params.URL)"
+        curl $(params.URL) || true
+        echo "\n"
+        CODE=$(curl -s -o /dev/null -w "%{http_code}" $(params.URL)) || true
+        echo "REPONSE CODE: ${CODE}"
+        if [ ${CODE} == 200 ]
+        then
+            exit 0
+        else
+            exit 1
+        fi
+

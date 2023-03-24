@@ -11,3 +11,11 @@ spec:
     value: $(body.issue.number)
   - name: git-repo-url
     value: $(body.repository.clone_url)
+  - name: GIT_REVISION
+    value: $(body.pull_request.head.sha)
+  - name: GIT_REPO
+    value: $(body.repository.clone_url)
+  - name: GIT_REPO_NAME
+    value: $(body.repository.name)
+  - name: GIT_REPO_FULL_NAME
+    value: $(body.repository.full_name)

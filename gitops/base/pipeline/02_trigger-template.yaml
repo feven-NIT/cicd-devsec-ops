@@ -20,6 +20,10 @@ spec:
     name: trigger-payload
   - description: number of the PR
     name: pr-number
+  - name: GIT_REPO
+  - name: GIT_REVISION
+  - name: GIT_REPO_NAME
+  - name: GIT_REPO_FULL_NAME
   resourcetemplates:
   - apiVersion: tekton.dev/v1beta1
     kind: PipelineRun
@@ -38,6 +42,26 @@ spec:
           value: src/main/docker/Dockerfile.jvm
         - name: pr-number
           value: $(tt.params.pr-number)
+        - name: IMAGE_REPO
+          value: "quay.io/feven/cicd-e2e"
+        - name: UI_BASE_PATH
+          value: "@TODO"
+        - name: GIT_REPO
+          value: $(tt.params.GIT_REPO)
+        - name: GIT_REVISION
+          value: $(tt.params.GIT_REVISION)
+        - name: GIT_REPO_NAME
+          value: $(tt.params.GIT_REPO_NAME)
+        - name: GIT_REPO_FULL_NAME
+          value: $(tt.params.GIT_REPO_FULL_NAME)
+        - name: GITEA_HOST_URL
+          value: "@TODO"
+        - name: GITEA_HTTPS_OR_HTTP
+          value: https
+        - name: GITEA_TOKEN_SECRET_NAME
+          value: gitea-bot-token
+        - name: GITEA_TOKEN_SECRET_KEY
+          value: token
       pipelineRef:
         name: clone-build-push
       serviceAccountName: pipeline

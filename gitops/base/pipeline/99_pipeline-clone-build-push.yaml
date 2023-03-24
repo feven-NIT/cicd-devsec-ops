@@ -1,0 +1,373 @@
+apiVersion: tekton.dev/v1beta1
+kind: Pipeline
+metadata:
+  name: clone-build-push
+  namespace: cicd-devsec-ops
+spec:
+  description: | 
+    This pipeline clones a git repo, builds a Docker image with Kaniko and
+    pushes it to a registry
+  params:
+  - name: repo-url
+    type: string
+  - name: image-reference
+    type: string
+  - name: dockerpath
+    description: path to dockerfile
+    type: string
+  - name: pr-number
+    type: string
+  workspaces:
+  - name: shared-data
+  - name: maven-settings
+  tasks:
+  - name: fetch-source
+    taskRef:
+      name: git-clone
+    workspaces:
+    - name: output
+      workspace: shared-data
+    params:
+    - name: url
+      value: $(params.repo-url)
+    - name: sslVerify
+      value: "false"
+  - name: maven-run
+    taskRef:
+      name: maven
+    runAfter:
+      - fetch-source
+    params:
+      #- name: CONTEXT_DIR
+      #  value: "apps/greeter/java/quarkus"
+      - name: GOALS
+        value:
+          - -DskipTests
+          - clean
+          - package
+    workspaces:
+      - name: maven-settings
+        workspace: maven-settings
+      - name: source
+        workspace: shared-data
+  - name: build-push
+    runAfter: 
+      - maven-run 
+    taskRef:
+      name: kaniko
+    workspaces:
+    - name: source
+      workspace: shared-data
+        #  - name: dockerconfig
+        #workspace: docker-credentials
+    params:
+    - name: IMAGE
+      value: $(params.image-reference)
+    - name: DOCKERFILE
+      value: $(params.dockerpath)
+  - name: sign-image
+    params:
+      - name: image
+        value: $(params.image-reference)
+    runAfter:
+      - build-push
+    taskRef:
+      kind: Task
+      name: cosign
+        #workspaces:
+        #- name: source
+        #workspace: shared-data
+  - name: image-check
+    runAfter:
+      - sign-image
+    taskRef:
+      name: stackrox-image-check
+      kind: ClusterTask
+    params:
+      - name: image
+        value: $(params.image-reference)
+      - name: rox_api_token
+        value: roxsecrets
+      - name: rox_central_endpoint
+        value: roxsecrets
+  - name: image-scan
+    runAfter:
+      - image-check
+    taskRef:
+      name: stackrox-image-scan
+      kind: ClusterTask
+    params:
+      - name: image
+        value: $(params.image-reference)
+      - name: rox_api_token
+        value: roxsecrets
+      - name: rox_central_endpoint
+        value: roxsecrets
+      - name: output_format
+        value: csv
+  - name: gitea-set-status
+    runAfter:
+      - image-scan
+    params:
+      - name: git-repo-url
+        value: $(params.repo-url)
+      - name: pr-number
+        value: $(params.pr-number)
+    taskRef:
+      kind: ClusterTask
+      name: validated-pr 
+  finally:
+    - name: gitea-status-fail-integration
+      when:
+        - input: $(tasks.integration-test.status)
+          operator: in
+          values: ["Failed", "None"]
+      params:
+        - name: GITEA_HOST_URL
+          value: $(params.GITEA_HOST_URL)
+        - name: GITEA_HTTPS_OR_HTTP
+          value: $(params.GITEA_HTTPS_OR_HTTP)
+        - name: API_PATH_PREFIX
+          value: /api/v1
+        - name: REPO_FULL_NAME
+          value: $(params.GIT_REPO_FULL_NAME)
+        - name: GITEA_TOKEN_SECRET_NAME
+          value: $(params.GITEA_TOKEN_SECRET_NAME)
+        - name: GITEA_TOKEN_SECRET_KEY
+          value: $(params.GITEA_TOKEN_SECRET_KEY)
+        - name: SHA
+          value: $(params.GIT_REVISION)
+        - name: TARGET_URL
+          value: $(params.UI_BASE_PATH)/$(context.pipelineRun.name)
+        - name: DESCRIPTION
+          value: Integration test failure
+        - name: CONTEXT
+          value: continuous-integration/tekton
+        - name: STATE
+          value: failure
+        - name: IMAGE
+          value: >-
+            python:3.10.1-alpine3.15@sha256:affe0faa14e7553fc570beec3864e74b5e36f8c19b2bb49ae8ba79c0e9e7236e
+        - name: SHEBANG
+          value: /usr/bin/env python
+      taskRef:
+        kind: Task
+        name: gitea-set-status
+    - name: gitea-status-success-integration
+      when:
+        - input: $(tasks.integration-test.status)
+          operator: in
+          values: ["Succeeded"]
+      params:
+        - name: GITEA_HOST_URL
+          value: $(params.GITEA_HOST_URL)
+        - name: GITEA_HTTPS_OR_HTTP
+          value: $(params.GITEA_HTTPS_OR_HTTP)
+        - name: API_PATH_PREFIX
+          value: /api/v1
+        - name: REPO_FULL_NAME
+          value: $(params.GIT_REPO_FULL_NAME)
+        - name: GITEA_TOKEN_SECRET_NAME
+          value: $(params.GITEA_TOKEN_SECRET_NAME)
+        - name: GITEA_TOKEN_SECRET_KEY
+          value: $(params.GITEA_TOKEN_SECRET_KEY)
+        - name: SHA
+          value: $(params.GIT_REVISION)
+        - name: TARGET_URL
+          value: $(params.UI_BASE_PATH)/$(context.pipelineRun.name)
+        - name: DESCRIPTION
+          value: Integration test success
+        - name: CONTEXT
+          value: continuous-integration/tekton
+        - name: STATE
+          value: success
+        - name: IMAGE
+          value: >-
+            python:3.10.1-alpine3.15@sha256:affe0faa14e7553fc570beec3864e74b5e36f8c19b2bb49ae8ba79c0e9e7236e
+        - name: SHEBANG
+          value: /usr/bin/env python
+      taskRef:
+        kind: Task
+        name: gitea-set-status
+    - name: gitea-status-fail-unit-test
+      when:
+        - input: $(tasks.pytest.status)
+          operator: in
+          values: ["Failed", "None"]
+      params:
+        - name: GITEA_HOST_URL
+          value: $(params.GITEA_HOST_URL)
+        - name: GITEA_HTTPS_OR_HTTP
+          value: $(params.GITEA_HTTPS_OR_HTTP)
+        - name: API_PATH_PREFIX
+          value: /api/v1
+        - name: REPO_FULL_NAME
+          value: $(params.GIT_REPO_FULL_NAME)
+        - name: GITEA_TOKEN_SECRET_NAME
+          value: $(params.GITEA_TOKEN_SECRET_NAME)
+        - name: GITEA_TOKEN_SECRET_KEY
+          value: $(params.GITEA_TOKEN_SECRET_KEY)
+        - name: SHA
+          value: $(params.GIT_REVISION)
+        - name: TARGET_URL
+          value: $(params.UI_BASE_PATH)/$(context.pipelineRun.name)
+        - name: DESCRIPTION
+          value: Unit test failure
+        - name: CONTEXT
+          value: continuous-integration/tekton
+        - name: STATE
+          value: failure
+        - name: IMAGE
+          value: >-
+            python:3.10.1-alpine3.15@sha256:affe0faa14e7553fc570beec3864e74b5e36f8c19b2bb49ae8ba79c0e9e7236e
+        - name: SHEBANG
+          value: /usr/bin/env python
+      taskRef:
+        kind: Task
+        name: gitea-set-status
+    - name: gitea-status-success-unit-test
+      when:
+        - input: $(tasks.pytest.status)
+          operator: in
+          values: ["Succeeded"]
+      params:
+        - name: GITEA_HOST_URL
+          value: $(params.GITEA_HOST_URL)
+        - name: GITEA_HTTPS_OR_HTTP
+          value: $(params.GITEA_HTTPS_OR_HTTP)
+        - name: API_PATH_PREFIX
+          value: /api/v1
+        - name: REPO_FULL_NAME
+          value: $(params.GIT_REPO_FULL_NAME)
+        - name: GITEA_TOKEN_SECRET_NAME
+          value: $(params.GITEA_TOKEN_SECRET_NAME)
+        - name: GITEA_TOKEN_SECRET_KEY
+          value: $(params.GITEA_TOKEN_SECRET_KEY)
+        - name: SHA
+          value: $(params.GIT_REVISION)
+        - name: TARGET_URL
+          value: $(params.UI_BASE_PATH)/$(context.pipelineRun.name)
+        - name: DESCRIPTION
+          value: Unit test success
+        - name: CONTEXT
+          value: continuous-integration/tekton
+        - name: STATE
+          value: success
+        - name: IMAGE
+          value: >-
+            python:3.10.1-alpine3.15@sha256:affe0faa14e7553fc570beec3864e74b5e36f8c19b2bb49ae8ba79c0e9e7236e
+        - name: SHEBANG
+          value: /usr/bin/env python
+      taskRef:
+        kind: Task
+        name: gitea-set-status
+  params:
+    - name: IMAGE_REPO
+      type: string
+    - name: GIT_REPO
+      type: string
+    - name: GIT_REVISION
+      type: string
+    - name: GIT_REPO_NAME
+      type: string
+    - name: UI_BASE_PATH
+      type: string
+    - name: GIT_REPO_FULL_NAME
+      type: string
+    - name: GITEA_HOST_URL
+      type: string
+    - name: GITEA_HTTPS_OR_HTTP
+      type: string
+    - name: GITEA_TOKEN_SECRET_NAME
+      type: string
+    - name: GITEA_TOKEN_SECRET_KEY
+      type: string
+  tasks:
+    - name: fetch-repository
+      params:
+        - name: url
+          value: $(params.GIT_REPO)
+        - name: revision
+          value: $(params.GIT_REVISION)
+        - name: deleteExisting
+          value: 'true'
+        - name: sslVerify
+          value: 'false'
+      taskRef:
+        kind: Task
+        name: git-clone
+      workspaces:
+        - name: output
+          workspace: tekton-pvc
+    - name: pytest
+      params:
+        - name: SOURCE_PATH
+          value: .
+        - name: REQUIREMENTS_FILE
+          value: requirements.txt
+        - name: PYTHON_IMAGE
+          value: >-
+            registry.redhat.io/rhel8/python-38:1-121
+      runAfter:
+        - fetch-repository
+      taskRef:
+        kind: Task
+        name: pytest
+      workspaces:
+        - name: source
+          workspace: tekton-pvc
+    - name: s2i-python
+      params:
+        - name: VERSION
+          value: latest
+        - name: PATH_CONTEXT
+          value: .
+        - name: TLSVERIFY
+          value: 'true'
+        - name: IMAGE
+          value: '$(params.IMAGE_REPO)/$(params.GIT_REPO_NAME):$(params.GIT_REVISION)'
+        - name: BUILDER_IMAGE
+          value: >-
+            registry.redhat.io/rhel8/buildah@sha256:ac0b8714cc260c94435cab46fe41b3de0ccbc3d93e38c395fa9d52ac49e521fe
+      runAfter:
+        - pytest
+      taskRef:
+        kind: Task
+        name: s2i-python-with-scc
+      workspaces:
+        - name: source
+          workspace: tekton-pvc
+    - name: deploy
+      params:
+        - name: SCRIPT
+          value: >
+            oc new-app --docker-image
+            $(params.IMAGE_REPO)/$(params.GIT_REPO_NAME):$(params.GIT_REVISION)
+            --name $(params.GIT_REPO_NAME)
+
+            oc wait --for=condition=available --timeout=60s
+            deployment/$(params.GIT_REPO_NAME)
+      runAfter:
+        - s2i-python
+      taskRef:
+        kind: Task
+        name: openshift-client
+    - name: integration-test
+      params:
+        - name: URL
+          value: 'http://$(params.GIT_REPO_NAME):8080'
+      runAfter:
+        - deploy
+      taskRef:
+        kind: Task
+        name: curl
+    - name: delete-deployment
+      params:
+        - name: SCRIPT
+          value: |
+            oc delete all -l app=$(params.GIT_REPO_NAME)
+      runAfter:
+        - integration-test
+      taskRef:
+        kind: Task
+        name: openshift-client
