@@ -11,13 +11,10 @@ resources:
   - ./pipeline/07_task-sign-image.yaml
   - ./pipeline/08_task-image-check.yaml
   - ./pipeline/09_task-image-scan.yaml
-  - ./pipeline/10_task-deploy.yaml
-  - ./pipeline/10_task-gitea-set-status.yaml
+  - ./pipeline/10_task-openshift-client.yaml
   - ./pipeline/11_task-integration-test.yaml
-  - ./pipeline/12_task-delete-deploy.yaml
-  - ./pipeline/13_task-gitea-set-status.yaml
+  - ./pipeline/12_task-gitea-set-status.yaml
   - ./pipeline/99_pipeline-clone-build-push.yaml
-
 
   - ./vault/hashicorp.yaml
 
