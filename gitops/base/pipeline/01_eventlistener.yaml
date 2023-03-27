@@ -17,9 +17,8 @@ spec:
         value:
           secretKey: GIT_HOOK_SECRET
           secretName: cicd-devsec-ops-githook-secret
-      - name: validEvents
-        value:
-        - issue_comment
+      - name: "eventTypes"
+        value: ["pull_request"]
       ref:
         apiVersion: triggers.tekton.dev
         kind: ClusterInterceptor

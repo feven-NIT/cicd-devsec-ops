@@ -8,12 +8,6 @@ spec:
     This pipeline clones a git repo, builds a Docker image with Kaniko and
     pushes it to a registry
   params:
-    - name: repo-url
-      type: string
-    - name: image-reference
-      type: string
-    - name: dockerpath
-      description: path to dockerfile
       type: string
     - name: pr-number
       type: string
@@ -95,7 +89,7 @@ spec:
     - name: sign-image
       params:
         - name: image
-          value: $(params.image-reference)
+          value: $(params.IMAGE_REPO)
       runAfter:
         - s2i
       taskRef:
@@ -109,7 +103,7 @@ spec:
         kind: Task
       params:
         - name: image
-          value: $(params.image-reference)
+          value: $(params.IMAGE_REPO)
         - name: rox_api_token
           value: roxsecrets
         - name: rox_central_endpoint
@@ -122,7 +116,7 @@ spec:
         kind: Task
       params:
         - name: image
-          value: $(params.image-reference)
+          value: $(params.IMAGE_REPO)
         - name: rox_api_token
           value: roxsecrets
         - name: rox_central_endpoint

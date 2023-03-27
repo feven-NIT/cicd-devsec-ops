@@ -7,18 +7,7 @@ metadata:
   namespace: cicd-devsec-ops
 spec:
   params:
-  - default: main
-    description: The git SHA to checkout
-    name: git-checkout-sha
-  - description: The git repository url
-    name: git-repo-url
-  - description: The SHA256 signature of the payload
-    name: git-signature
-  - description: The git event that caused the webhook to fire
-    name: git-event
-  - description: The trigger payload
-    name: trigger-payload
-  - description: number of the PR
+  - description: Pull request number
     name: pr-number
   - name: GIT_REPO
   - name: GIT_REVISION
@@ -33,13 +22,6 @@ spec:
         app-name: cicd-devsec-ops
     spec:
       params:
-        - name: repo-url
-          #value: https://gitea-gitea.apps.ocp1.redhat.hpecic.net/demo/cicd-devsec-ops.git          
-          value: $(tt.params.git-repo-url)
-        - name: image-reference
-          value: quay.io/feven/cicd-e2e
-        - name: dockerpath
-          value: src/main/docker/Dockerfile.jvm
         - name: pr-number
           value: $(tt.params.pr-number)
         - name: IMAGE_REPO
@@ -70,5 +52,3 @@ spec:
         - name: shared-data
           persistentVolumeClaim:
             claimName: tekton-pvc
-        - emptyDir: {} 
-          name: maven-settings

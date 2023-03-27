@@ -9,8 +9,6 @@ spec:
   #   value: $(body.after)
   - name: pr-number
     value: $(body.issue.number)
-  - name: git-repo-url
-    value: $(body.repository.clone_url)
   - name: GIT_REVISION
     value: $(body.pull_request.head.sha)
   - name: GIT_REPO
