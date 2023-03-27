@@ -7,7 +7,7 @@ spec:
   project: cicd-devsec-ops
   source:
     repoURL: https://github.com/feven-redhat/cicd-devsec-ops.git
-    targetRevision: pull-request
+    targetRevision: main
     path: gitops/base
   destination:
     server: https://kubernetes.default.svc
