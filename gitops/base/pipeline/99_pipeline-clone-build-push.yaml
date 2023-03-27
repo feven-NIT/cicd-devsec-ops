@@ -8,7 +8,6 @@ spec:
     This pipeline clones a git repo, builds a Docker image with Kaniko and
     pushes it to a registry
   params:
-      type: string
     - name: pr-number
       type: string
     - name: IMAGE_REPO
