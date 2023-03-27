@@ -1,0 +1,9 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: chains-config
+  namespace: openshift-pipelines
+data:
+  artifacts.taskrun.format: in-toto
+  artifacts.taskrun.storage: oci
+  transparency.enabled: "true"

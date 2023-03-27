@@ -5,10 +5,8 @@ metadata:
   namespace: cicd-devsec-ops
 spec:
   params:
-  # - name: git-checkout-sha
-  #   value: $(body.after)
   - name: pr-number
-    value: $(body.issue.number)
+    value: $(body.pull_request.number)
   - name: GIT_REVISION
     value: $(body.pull_request.head.sha)
   - name: GIT_REPO

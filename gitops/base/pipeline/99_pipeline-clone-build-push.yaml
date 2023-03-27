@@ -64,62 +64,83 @@ spec:
       workspaces:
         - name: source
           workspace: tekton-pvc
-    - name: s2i
+    # - name: s2i
+    #   params:
+    #     - name: VERSION
+    #       value: latest
+    #     - name: PATH_CONTEXT
+    #       value: .
+    #     - name: TLSVERIFY
+    #       value: 'true'
+    #     - name: IMAGE
+    #       value: '$(params.IMAGE_REPO)/$(params.GIT_REPO_NAME):$(params.GIT_REVISION)'
+    #     - name: BUILDER_IMAGE
+    #       value: >-
+    #         image-registry.openshift-image-registry.svc:5000/openshift/python:3.9-ubi8
+    #   runAfter:
+    #     - pytest
+    #   taskRef:
+    #     kind: Task
+    #     name: s2i
+    #   workspaces:
+    #     - name: source
+    #       workspace: tekton-pvc
+    - name: kaniko
       params:
-        - name: VERSION
-          value: latest
-        - name: PATH_CONTEXT
-          value: .
-        - name: TLSVERIFY
-          value: 'true'
         - name: IMAGE
           value: '$(params.IMAGE_REPO)/$(params.GIT_REPO_NAME):$(params.GIT_REVISION)'
-        - name: BUILDER_IMAGE
-          value: >-
-            image-registry.openshift-image-registry.svc:5000/openshift/python:3.9-ubi8
       runAfter:
         - pytest
       taskRef:
         kind: Task
-        name: s2i
+        name: kaniko
       workspaces:
         - name: source
           workspace: tekton-pvc
-    - name: sign-image
-      params:
-        - name: image
-          value: $(params.IMAGE_REPO)
-      runAfter:
-        - s2i
-      taskRef:
-        kind: Task
-        name: cosign
+        - name: dockerconfig
+          workspace: dockerconfig
+    # - name: sign-image
+    #   params:
+    #     - name: image
+    #       value: $(params.IMAGE_REPO)
+    #   runAfter:
+    #     - kaniko
+    #   taskRef:
+    #     kind: Task
+    #     name: cosign
     - name: image-check
       runAfter:
-        - sign-image
+        - kaniko
       taskRef:
         name: stackrox-image-check
         kind: Task
       params:
         - name: image
-          value: $(params.IMAGE_REPO)
+          value: $(tasks.kaniko.results.IMAGE_URL)
         - name: rox_api_token
-          value: roxsecrets
+          value: rox-api-token
         - name: rox_central_endpoint
-          value: roxsecrets
+          value: rox-central-endpoint
+        - name: insecure-skip-tls-verify
+          value: "true"
     - name: image-scan
       runAfter:
         - image-check
       taskRef:
         name: stackrox-image-scan
         kind: Task
+      workspaces:
+        - name: result
+          workspace: tekton-pvc
       params:
         - name: image
-          value: $(params.IMAGE_REPO)
+          value: $(tasks.kaniko.results.IMAGE_URL)
         - name: rox_api_token
-          value: roxsecrets
+          value: rox-api-token
         - name: rox_central_endpoint
-          value: roxsecrets
+          value: rox-central-endpoint
+        - name: insecure-skip-tls-verify
+          value: "true"
         - name: output_format
           value: csv
     - name: deploy
@@ -182,7 +203,7 @@ spec:
         - name: DESCRIPTION
           value: Integration test failure
         - name: CONTEXT
-          value: continuous-integration/tekton
+          value: continuous-integration/integration-test/tekton
         - name: STATE
           value: failure
         - name: IMAGE
@@ -218,7 +239,7 @@ spec:
         - name: DESCRIPTION
           value: Integration test success
         - name: CONTEXT
-          value: continuous-integration/tekton
+          value: continuous-integration/integration-test/tekton
         - name: STATE
           value: success
         - name: IMAGE
@@ -254,7 +275,7 @@ spec:
         - name: DESCRIPTION
           value: Unit test failure
         - name: CONTEXT
-          value: continuous-integration/tekton
+          value: continuous-integration/unit-test/tekton
         - name: STATE
           value: failure
         - name: IMAGE
@@ -290,7 +311,7 @@ spec:
         - name: DESCRIPTION
           value: Unit test success
         - name: CONTEXT
-          value: continuous-integration/tekton
+          value: continuous-integration/unit-test/tekton
         - name: STATE
           value: success
         - name: IMAGE
@@ -303,3 +324,4 @@ spec:
         name: gitea-set-status
   workspaces:
     - name: tekton-pvc
+    - name: dockerconfig

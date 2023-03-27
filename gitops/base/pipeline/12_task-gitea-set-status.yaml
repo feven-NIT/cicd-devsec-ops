@@ -120,7 +120,6 @@ spec:
         import json
         import sys
         import http.client
-        import ssl
 
         gitea_token = open("/etc/gitea-set-status/$(params.GITEA_TOKEN_SECRET_KEY)", "r").read()
 
@@ -139,10 +138,7 @@ spec:
         authHeader = "token " + gitea_token
 
         if "$(params.GITEA_HTTPS_OR_HTTP)" == "https":
-          conn = http.client.HTTPSConnection(
-            "$(params.GITEA_HOST_URL)",
-            context = ssl._create_unverified_context()
-          )
+          conn = http.client.HTTPSConnection("$(params.GITEA_HOST_URL)")
         else:
           conn = http.client.HTTPConnection("$(params.GITEA_HOST_URL)")
 

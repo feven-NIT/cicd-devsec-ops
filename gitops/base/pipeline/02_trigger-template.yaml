@@ -25,9 +25,9 @@ spec:
         - name: pr-number
           value: $(tt.params.pr-number)
         - name: IMAGE_REPO
-          value: "quay.io/feven/cicd-e2e"
+          value: "quay.io/alegrosdemos"
         - name: UI_BASE_PATH
-          value: "@TODO"
+          value: "https://console-openshift-console.apps.rosa-6cq27.qkm6.p1.openshiftapps.com/k8s/ns/cicd-devsec-ops/tekton.dev~v1beta1~Pipeline/clone-build-push/Runs"
         - name: GIT_REPO
           value: $(tt.params.GIT_REPO)
         - name: GIT_REVISION
@@ -37,7 +37,7 @@ spec:
         - name: GIT_REPO_FULL_NAME
           value: $(tt.params.GIT_REPO_FULL_NAME)
         - name: GITEA_HOST_URL
-          value: "@TODO"
+          value: "gitea-gitea.apps.rosa-6cq27.qkm6.p1.openshiftapps.com"
         - name: GITEA_HTTPS_OR_HTTP
           value: https
         - name: GITEA_TOKEN_SECRET_NAME
@@ -46,9 +46,12 @@ spec:
           value: token
       pipelineRef:
         name: clone-build-push
-      serviceAccountName: pipeline
+      serviceAccountName: build-bot
       timeout: 1h0m0s
       workspaces:
-        - name: shared-data
+        - name: tekton-pvc
           persistentVolumeClaim:
             claimName: tekton-pvc
+        - name: dockerconfig
+          secret:
+            secretName: quay-alegrosdemos

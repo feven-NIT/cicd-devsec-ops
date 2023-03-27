@@ -8,15 +8,23 @@ resources:
   - ./pipeline/04_task-fetch-source.yaml
   - ./pipeline/05_task-pytest.yaml
   - ./pipeline/06_task-s2i.yaml
-  - ./pipeline/07_task-sign-image.yaml
+  # - ./pipeline/07_task-sign-image.yaml
   - ./pipeline/08_task-image-check.yaml
   - ./pipeline/09_task-image-scan.yaml
   - ./pipeline/10_task-openshift-client.yaml
   - ./pipeline/11_task-integration-test.yaml
   - ./pipeline/12_task-gitea-set-status.yaml
+  - ./pipeline/13_task-kaniko.yaml
   - ./pipeline/99_pipeline-clone-build-push.yaml
 
   - ./secret/githook.yaml
+  - ./secret/gitea-bot-token.yaml
+
+  - ./rbac/build-bot.yaml
+
+  - ./tektonchains/tektonchain.yaml
+  - ./tektonchains/config.yaml
+  - ./tektonchains/quay-auth.yaml
 
   #- ./vault/hashicorp.yaml
 
@@ -25,3 +33,5 @@ resources:
   - ./gitea/gitea-route.yaml
   - ./gitea/gitea-server.yaml
 
+  - ./rhacs/rox-api-token.yaml
+  - ./rhacs/rox-central-endpoint.yaml

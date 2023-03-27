@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: Secret
+metadata:
+  name: quay-alegrosdemos
+type: kubernetes.io/dockerconfigjson
+data:
+  .dockerconfigjson: ewogICJhdXRocyI6IHsKICAgICJxdWF5LmlvIjogewogICAgICAiYXV0aCI6ICJZV3hsWjNKdmMyUmxiVzl6SzJGa2JXbHVPbGc1VVZSS1NEbFVTemt5U1RKRVVsRTFWVTVDU2xSSU1rUlZVMVEwVDBSSlVURTVOa1pIT1ZCSE5raEdPRGRTVEVkWlRERXpOa1JKU1ZaVVYwdFFURkE9IiwKICAgICAgImVtYWlsIjogIiIKICAgIH0KICB9Cn0=

@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: Secret
+metadata:
+  name: rox-central-endpoint
+type: Opaque
+stringData:
+  rox_central_endpoint: central.rhacs-operator.svc:443
