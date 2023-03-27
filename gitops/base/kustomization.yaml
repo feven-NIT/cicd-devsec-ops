@@ -20,6 +20,7 @@ resources:
 
   #- ./vault/hashicorp.yaml
 
+  - ./gitea/gitea-interceptor-serviceaccount.yaml
   - ./gitea/gitea-interceptor.yaml
   - ./gitea/gitea-route.yaml
   - ./gitea/gitea-server.yaml
