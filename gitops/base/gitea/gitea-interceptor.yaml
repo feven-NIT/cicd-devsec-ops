@@ -2,7 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: gitea-interceptor
-  namespace: openshift-pipelines
+  namespace: gitea
 spec:
   replicas: 1
   selector:
@@ -40,7 +40,7 @@ metadata:
   labels:
     app: gitea-interceptor
   name: gitea-interceptor
-  namespace: openshift-pipelines
+  namespace: gitea
 spec:
   ports:
     - name: "http"
@@ -57,6 +57,6 @@ spec:
   clientConfig:
     service:
       name: gitea-interceptor
-      namespace: openshift-pipelines
+      namespace: gitea
       path: "/gitea"
 ---
