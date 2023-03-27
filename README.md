@@ -10,6 +10,8 @@ oc apply -f gitops/sub.yaml
 oc apply -f gitops/ns.yaml
 ```
 
+Add quay authentication in ./gitops/argocd/tektonchains/quay-auth.yaml
+
 ## Configure the cicd chain
 
 Create the argoCD chain project
