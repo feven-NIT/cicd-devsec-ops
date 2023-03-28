@@ -1,7 +1,0 @@
-apiVersion: v1
-kind: Secret
-metadata:
-  name: quay-alegrosdemos
-type: kubernetes.io/dockerconfigjson
-data:
-  .dockerconfigjson: SECRET_HERE

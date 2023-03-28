@@ -42,12 +42,12 @@ spec:
         When set to `"true"`, skip verifying the TLS certs of the Central
         endpoint.  Defaults to `"false"`.
       default: "false"
-  workspaces:
-    - name: result
-      description: Store the scan result
-  results:
-    - name: SCAN_RESULT
-      description: Scan result
+  # workspaces:
+  #   - name: result
+  #     description: Store the scan result
+  # results:
+  #   - name: SCAN_RESULT
+  #     description: Scan result
   steps:
     - name: rox-image-scan
       image: docker.io/centos@sha256:a1801b843b1bfaf77c501e7a6d3f709401a1e0c83863037fa3aab063a7fdb9dc
@@ -74,4 +74,4 @@ spec:
           $( [ "$(params.insecure-skip-tls-verify)" = "true" ] && \
           echo -n "--insecure-skip-tls-verify") \
           -e "$ROX_CENTRAL_ENDPOINT" --image "$(params.image)" \
-          --format "$(params.output_format)" > "$(results.SCAN_RESULT.path)"
+          --format "$(params.output_format)"

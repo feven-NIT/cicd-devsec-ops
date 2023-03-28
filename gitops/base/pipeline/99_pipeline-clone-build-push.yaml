@@ -129,9 +129,9 @@ spec:
       taskRef:
         name: stackrox-image-scan
         kind: Task
-      workspaces:
-        - name: result
-          workspace: tekton-pvc
+      # workspaces:
+      #   - name: result
+      #     workspace: tekton-pvc
       params:
         - name: image
           value: $(tasks.kaniko.results.IMAGE_URL)

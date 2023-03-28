@@ -24,7 +24,6 @@ resources:
 
   - ./tektonchains/tektonchain.yaml
   - ./tektonchains/config.yaml
-  - ./tektonchains/quay-auth.yaml
 
   #- ./vault/hashicorp.yaml
 

@@ -50,3 +50,16 @@ subjects:
   name: build-bot
   namespace: cicd-devsec-ops
 ---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: build-bot-edit
+  namespace: cicd-devsec-ops
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: edit
+subjects:
+- kind: ServiceAccount
+  name: build-bot
+  namespace: cicd-devsec-ops
