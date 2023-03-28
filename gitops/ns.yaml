@@ -4,6 +4,8 @@ metadata:
   name: cicd-devsec-ops 
   annotations:
     openshift.io/node-selector: ""
+  labels:
+    argocd.argoproj.io/managed-by: openshift-gitops
 ---
 apiVersion: v1
 kind: Namespace
@@ -11,3 +13,5 @@ metadata:
   name: gitea
   annotations:
     openshift.io/node-selector: ""
+  labels:
+    argocd.argoproj.io/managed-by: openshift-gitops
