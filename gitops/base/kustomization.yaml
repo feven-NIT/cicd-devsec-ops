@@ -17,9 +17,6 @@ resources:
   - ./pipeline/13_task-kaniko.yaml
   - ./pipeline/99_pipeline-clone-build-push.yaml
 
-  - ./secret/githook.yaml
-  - ./secret/gitea-bot-token.yaml
-
   - ./rbac/build-bot.yaml
 
   - ./tektonchains/tektonchain.yaml
@@ -31,6 +28,3 @@ resources:
   - ./gitea/gitea-interceptor.yaml
   - ./gitea/gitea-route.yaml
   - ./gitea/gitea-server.yaml
-
-  - ./rhacs/rox-api-token.yaml
-  - ./rhacs/rox-central-endpoint.yaml
