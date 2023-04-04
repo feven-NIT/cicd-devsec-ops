@@ -30,6 +30,6 @@ resources:
   - ./gitea/gitea-server.yaml
 
   - ./rhacs/central.yaml
-  - ./rhacs/create-cluster-init-bunde-job.yaml
+  - ./rhacs/create-cluster-init-bundle-job.yaml
   - ./rhacs/create-cluster-init-bundle-sa.yaml
   - ./rhacs/secured-cluster.yaml
