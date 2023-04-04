@@ -8,7 +8,13 @@ This repo contains the material to deploy a cicd chain on openshift.
 ```shell
 oc apply -f gitops/sub.yaml
 oc apply -f gitops/ns.yaml
+oc apply -f gitops/ClusterRoleBinding.yaml 
 ```
+
+## Configure RHACS
+
+
+
 
 - Add quay authentication "registry-credentials"
 - Patch build-bot
