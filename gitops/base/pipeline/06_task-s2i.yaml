@@ -46,6 +46,8 @@ spec:
   results:
     - name: IMAGE_DIGEST
       description: Digest of the image just built.
+    - name: IMAGE_URL
+      description: Image URL.
   steps:
     - name: generate
       image: quay.io/openshift-pipeline/s2i:nightly
@@ -72,6 +74,8 @@ spec:
         buildah ${CERT_DIR_FLAG} push --tls-verify=$(params.TLSVERIFY) --digestfile $(workspaces.source.path)/image-digest \
           $(params.IMAGE) docker://$(params.IMAGE)
         cat $(workspaces.source.path)/image-digest | tee /tekton/results/IMAGE_DIGEST
+        image="$(params.IMAGE)"
+        echo -n "${image}" | tee /tekton/results/IMAGE_URL
       volumeMounts:
       - name: varlibcontainers
         mountPath: /var/lib/containers

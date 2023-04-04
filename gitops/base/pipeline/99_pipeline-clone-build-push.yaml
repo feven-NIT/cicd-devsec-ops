@@ -64,41 +64,40 @@ spec:
       workspaces:
         - name: source
           workspace: tekton-pvc
-    # - name: s2i
-    #   params:
-    #     - name: VERSION
-    #       value: latest
-    #     - name: PATH_CONTEXT
-    #       value: .
-    #     - name: TLSVERIFY
-    #       value: 'true'
-    #     - name: IMAGE
-    #       value: '$(params.IMAGE_REPO)/$(params.GIT_REPO_NAME):$(params.GIT_REVISION)'
-    #     - name: BUILDER_IMAGE
-    #       value: >-
-    #         image-registry.openshift-image-registry.svc:5000/openshift/python:3.9-ubi8
-    #   runAfter:
-    #     - pytest
-    #   taskRef:
-    #     kind: Task
-    #     name: s2i
-    #   workspaces:
-    #     - name: source
-    #       workspace: tekton-pvc
-    - name: kaniko
+    - name: s2i
       params:
+        - name: VERSION
+          value: latest
+        - name: PATH_CONTEXT
+          value: .
+        - name: TLSVERIFY
+          value: 'true'
         - name: IMAGE
           value: '$(params.IMAGE_REPO)/$(params.GIT_REPO_NAME):$(params.GIT_REVISION)'
+        - name: BUILDER_IMAGE
+          value: 'registry.access.redhat.com/ubi8/python-38:latest'
       runAfter:
         - pytest
       taskRef:
         kind: Task
-        name: kaniko
+        name: s2i
       workspaces:
         - name: source
           workspace: tekton-pvc
-        - name: dockerconfig
-          workspace: dockerconfig
+    # - name: kaniko
+    #   params:
+    #     - name: IMAGE
+    #       value: '$(params.IMAGE_REPO)/$(params.GIT_REPO_NAME):$(params.GIT_REVISION)'
+    #   runAfter:
+    #     - pytest
+    #   taskRef:
+    #     kind: Task
+    #     name: kaniko
+    #   workspaces:
+    #     - name: source
+    #       workspace: tekton-pvc
+    #     - name: dockerconfig
+    #       workspace: dockerconfig
     # - name: sign-image
     #   params:
     #     - name: image
@@ -110,13 +109,13 @@ spec:
     #     name: cosign
     - name: image-check
       runAfter:
-        - kaniko
+        - s2i
       taskRef:
         name: stackrox-image-check
         kind: Task
       params:
         - name: image
-          value: $(tasks.kaniko.results.IMAGE_URL)
+          value: '$(params.IMAGE_REPO)/$(params.GIT_REPO_NAME)@$(tasks.s2i.results.IMAGE_DIGEST)'
         - name: rox_api_token
           value: rox-api-token
         - name: rox_central_endpoint
@@ -134,7 +133,7 @@ spec:
       #     workspace: tekton-pvc
       params:
         - name: image
-          value: $(tasks.kaniko.results.IMAGE_URL)
+          value: '$(params.IMAGE_REPO)/$(params.GIT_REPO_NAME)@$(tasks.s2i.results.IMAGE_DIGEST)'
         - name: rox_api_token
           value: rox-api-token
         - name: rox_central_endpoint
@@ -148,7 +147,7 @@ spec:
         - name: SCRIPT
           value: >
             oc new-app --docker-image
-            $(params.IMAGE_REPO)/$(params.GIT_REPO_NAME):$(params.GIT_REVISION)
+            $(params.IMAGE_REPO)/$(params.GIT_REPO_NAME)@$(tasks.s2i.results.IMAGE_DIGEST)
             --name $(params.GIT_REPO_NAME)
 
             oc wait --for=condition=available --timeout=60s
