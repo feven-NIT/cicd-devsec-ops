@@ -28,3 +28,8 @@ resources:
   - ./gitea/gitea-interceptor.yaml
   - ./gitea/gitea-route.yaml
   - ./gitea/gitea-server.yaml
+
+  - ./rhacs/central.yaml
+  - ./create-cluster-init-bunde-job.yaml
+  - ./create-cluster-init-bundle-sa.yaml
+  - ./secured-cluster.yaml
