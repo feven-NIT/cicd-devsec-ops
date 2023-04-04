@@ -11,9 +11,7 @@ oc apply -f gitops/ns.yaml
 oc apply -f gitops/ClusterRoleBinding.yaml 
 ```
 
-## Configure RHACS
-
-
+## Configuration
 
 
 - Add quay authentication "registry-credentials"
