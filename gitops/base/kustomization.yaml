@@ -1,7 +1,7 @@
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 resources:
-  - ./pipeline/00_pvc-tekton-pvc.yaml
+#  - ./pipeline/00_pvc-tekton-pvc.yaml
   - ./pipeline/01_eventlistener.yaml
   - ./pipeline/02_trigger-template.yaml
   - ./pipeline/03_triggerbinding-app-demo.yaml
