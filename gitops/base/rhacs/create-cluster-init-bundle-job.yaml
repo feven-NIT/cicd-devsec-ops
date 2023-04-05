@@ -1,8 +1,6 @@
 apiVersion: batch/v1
 kind: Job
 metadata:
-  annotations:
-    argocd.argoproj.io/sync-wave: "2"
   name: create-cluster-init-bundle
   namespace: rhacs-operator
 spec:
