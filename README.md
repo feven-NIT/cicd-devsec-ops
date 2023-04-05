@@ -11,16 +11,42 @@ oc apply -f gitops/ns.yaml
 oc apply -f gitops/ClusterRoleBinding.yaml 
 ```
 
-## Configuration
+## Quay configuration and credentials setup
+
+In quay.io create a public repository, that will be used to store the image build by the pipeline.
+
+![create repo](images/create-repo.png)
+
+Then create a robot accound that will be used by the pipeline service account in openshift.
+
+Click on your username on the top left > Account settings > Robot Accounts > Create Robot Account > Provide a name for your bot > select the repo that we have create in the previous step > Select admin permission. 
+
+Then click on Robot Account and copy the username and the password. 
 
 
-- Add quay authentication "registry-credentials"
+```shell
+export QUAY_TOKEN="XXX"
+export EMAIL="XXX"
+export USERNAME="feven+acs_integration"
+export NAMESPACE="cicd-devsec-ops"
+```
+
+Create a namespace and the secret for the registry
+
+```shell
+oc create ns ${NAMESPACE}
+oc create secret registry-credentials regcred --docker-server=quay.io --docker-username=${USERNAME} --docker-email=${EMAIL}--docker-password=${QUAY_TOKEN} -n ${NAMESPACE}
+```
+
+Patch the service account to get access to the creds
+
 - Patch build-bot
 ```shell
 oc patch serviceaccount  \
-  -p "{\"imagePullSecrets\": [{\"name\": \"registry-credentials\"}]}" -n cicd-devsec-ops
+  -p "{\"imagePullSecrets\": [{\"name\": \"registry-credentials\"}]}" -n ${NAMESPACE}
 ```
-- RHACS
+
+
 - GITEA WEBHOOK SECRET
 ```yaml
 apiVersion: v1
