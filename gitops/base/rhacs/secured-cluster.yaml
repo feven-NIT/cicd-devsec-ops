@@ -4,6 +4,7 @@ metadata:
   annotations:
     argocd.argoproj.io/sync-wave: "3"
   name: local-cluster
+  namespace: rhacs-operator
 spec:
   clusterName: local-cluster
   admissionControl:

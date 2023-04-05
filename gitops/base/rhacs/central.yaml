@@ -5,6 +5,7 @@ metadata:
   annotations:
     argocd.argoproj.io/sync-wave: "1"
   name: central
+  namespace: rhacs-operator
 spec:
   central:
     exposure:
