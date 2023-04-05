@@ -46,6 +46,7 @@ oc patch serviceaccount build-bot \
   -p "{\"imagePullSecrets\": [{\"name\": \"registry-credentials\"}]}" -n ${NAMESPACE}
 ```
 
+In gitea server replace ROOT_URL with your correct base domain
 
 - GITEA WEBHOOK SECRET
 

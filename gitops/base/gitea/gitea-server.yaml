@@ -55,7 +55,7 @@ data:
     ENABLE_PUSH_CREATE_ORG = true
 
     [server]
-    ROOT_URL = https://gitea-gitea.apps.$BASE_DOMAIN/
+    ROOT_URL = https://gitea-gitea.apps.cluster-7r7v7.7r7v7.sandbox2608.opentlc.com/
     HTTP_PORT = 3000
     STATIC_ROOT_PATH = /usr/local/gitea/web
     APP_DATA_PATH    = /usr/local/gitea/data
