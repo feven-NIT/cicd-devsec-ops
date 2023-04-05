@@ -14,19 +14,19 @@ spec:
     app: gitea-demo
   #type: LoadBalancer
 ---
-kind: PersistentVolumeClaim
-apiVersion: v1
-metadata:
-  name: gitea-pvc
-  namespace: gitea
-spec:
-  accessModes:
-    - ReadWriteOnce
-  storageClassName: gp3 
-  resources:
-    requests:
-      storage: 40Gi
-  volumeMode: Filesystem
+# kind: PersistentVolumeClaim
+# apiVersion: v1
+# metadata:
+#   name: gitea-pvc
+#   namespace: gitea
+# spec:
+#   accessModes:
+#     - ReadWriteOnce
+#   storageClassName: gp3 
+#   resources:
+#     requests:
+#       storage: 40Gi
+#   volumeMode: Filesystem
 ---
 kind: ConfigMap
 apiVersion: v1
