@@ -42,12 +42,13 @@ Patch the service account to get access to the creds
 
 - Patch build-bot
 ```shell
-oc patch serviceaccount  \
+oc patch serviceaccount build-bot \
   -p "{\"imagePullSecrets\": [{\"name\": \"registry-credentials\"}]}" -n ${NAMESPACE}
 ```
 
 
 - GITEA WEBHOOK SECRET
+
 ```yaml
 apiVersion: v1
 kind: Secret
@@ -59,7 +60,9 @@ stringData:
   token: CHANGE_ME
 ```
 - GITEA TOKEN
+
 ```yaml
+cat <<EOF | oc apply -f -
 apiVersion: v1
 kind: Secret
 metadata:
@@ -67,7 +70,8 @@ metadata:
   namespace: cicd-devsec-ops
 type: Opaque
 stringData:
-  GIT_HOOK_SECRET: CHANGE_ME
+  GIT_HOOK_SECRET: $(echo $RANDOM | md5sum | cut -d" " -f1)
+EOF
 ```
 - Cosign key
 ```shell

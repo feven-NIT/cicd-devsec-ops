@@ -27,7 +27,7 @@ spec:
         - name: IMAGE_REPO
           value: "quay.io/alegrosdemos"
         - name: UI_BASE_PATH
-          value: "https://console-openshift-console.apps.rosa-6cq27.qkm6.p1.openshiftapps.com/k8s/ns/cicd-devsec-ops/tekton.dev~v1beta1~Pipeline/clone-build-push/Runs"
+          value: "https://console.openshift-console.svc.cluster.local/k8s/ns/cicd-devsec-ops/tekton.dev~v1beta1~Pipeline/clone-build-push/Runs"
         - name: GIT_REPO
           value: $(tt.params.GIT_REPO)
         - name: GIT_REVISION
@@ -37,7 +37,7 @@ spec:
         - name: GIT_REPO_FULL_NAME
           value: $(tt.params.GIT_REPO_FULL_NAME)
         - name: GITEA_HOST_URL
-          value: "gitea-gitea.apps.rosa-6cq27.qkm6.p1.openshiftapps.com"
+          value: "gitea-http.gitea.svc.cluster.local"
         - name: GITEA_HTTPS_OR_HTTP
           value: https
         - name: GITEA_TOKEN_SECRET_NAME
