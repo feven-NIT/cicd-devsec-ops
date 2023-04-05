@@ -124,7 +124,7 @@ spec:
           value: "true"
     - name: image-scan
       runAfter:
-        - image-check
+        - s2i
       taskRef:
         name: stackrox-image-scan
         kind: Task
@@ -154,6 +154,7 @@ spec:
             deployment/$(params.GIT_REPO_NAME)
       runAfter:
         - image-scan
+        - image-check
       taskRef:
         kind: Task
         name: openshift-client
