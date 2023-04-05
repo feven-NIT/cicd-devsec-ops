@@ -35,7 +35,7 @@ Create a namespace and the secret for the registry
 
 ```shell
 oc create ns ${NAMESPACE}
-oc create secret registry-credentials regcred --docker-server=quay.io --docker-username=${USERNAME} --docker-email=${EMAIL}--docker-password=${QUAY_TOKEN} -n ${NAMESPACE}
+oc create secret  docker-registry registry-credentials  --docker-server=quay.io --docker-username=${USERNAME} --docker-email=${EMAIL} --docker-password=${QUAY_TOKEN} -n ${NAMESPACE}
 ```
 
 Patch the service account to get access to the creds
