@@ -33,3 +33,5 @@ resources:
   - ./rhacs/create-cluster-init-bundle-job.yaml
   - ./rhacs/create-cluster-init-bundle-sa.yaml
   - ./rhacs/secured-cluster.yaml
+
+   - ./quay/quay.yaml

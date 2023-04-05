@@ -15,3 +15,12 @@ metadata:
     openshift.io/node-selector: ""
   labels:
     argocd.argoproj.io/managed-by: openshift-gitops
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: quay
+  annotations:
+    openshift.io/node-selector: ""
+  labels:
+    argocd.argoproj.io/managed-by: openshift-gitops
