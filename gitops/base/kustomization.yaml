@@ -34,5 +34,5 @@ resources:
   - ./rhacs/create-cluster-init-bundle-sa.yaml
   - ./rhacs/secured-cluster.yaml
 
-  - values.yaml
+  - ./values.yaml
 
