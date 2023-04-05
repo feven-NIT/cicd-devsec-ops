@@ -36,7 +36,7 @@ roleRef:
 subjects:
   - kind: ServiceAccount
     name: create-cluster-init
-    namespace: stackrox
+    namespace: rhacs-operator
 ---
 apiVersion: v1
 kind: ServiceAccount
