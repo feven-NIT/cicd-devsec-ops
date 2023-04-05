@@ -50,6 +50,7 @@ oc patch serviceaccount build-bot \
 - GITEA WEBHOOK SECRET
 
 ```yaml
+cat <<EOF | oc apply -f -
 apiVersion: v1
 kind: Secret
 metadata:
@@ -57,7 +58,8 @@ metadata:
   namespace: cicd-devsec-ops
 type: Opaque
 stringData:
-  token: CHANGE_ME
+  token: 8c879debf5e65c8b03180cb5b9b073531200e036
+EOF
 ```
 - GITEA TOKEN
 

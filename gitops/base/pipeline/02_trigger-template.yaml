@@ -54,4 +54,4 @@ spec:
             claimName: tekton-pvc
         - name: dockerconfig
           secret:
-            secretName: quay-alegrosdemos
+            secretName: registry-credentials
