@@ -34,9 +34,25 @@ export NAMESPACE="cicd-devsec-ops"
 Create a namespace and the secret for the registry
 
 ```shell
-oc create ns ${NAMESPACE}
 oc create secret  docker-registry registry-credentials  --docker-server=quay.io --docker-username=${USERNAME} --docker-email=${EMAIL} --docker-password=${QUAY_TOKEN} -n ${NAMESPACE}
 ```
+
+In ./cicd-devsec-ops/gitops/base/gitea/gitea-server.yaml replace ROOT_URL with your correct base domain.
+In ./cicd-devsec-ops/gitops/base/pipeline/02_trigger-template.yaml replace GITEA_HOST_URL with your your correct base domain
+
+## Configure the cicd chain
+
+Create the argoCD chain project
+```shell
+oc apply -f gitops/argocd/project.yaml
+```
+
+Create the argoCD Application
+```shell
+oc apply -f gitops/argocd/application.yaml
+```
+
+## Post configuration
 
 Patch the service account to get access to the creds
 
@@ -45,8 +61,6 @@ Patch the service account to get access to the creds
 oc patch serviceaccount build-bot \
   -p "{\"imagePullSecrets\": [{\"name\": \"registry-credentials\"}]}" -n ${NAMESPACE}
 ```
-
-In gitea server replace ROOT_URL with your correct base domain
 
 - GITEA WEBHOOK SECRET
 
@@ -62,6 +76,7 @@ stringData:
   token: 8c879debf5e65c8b03180cb5b9b073531200e036
 EOF
 ```
+
 - GITEA TOKEN
 
 ```yaml
@@ -76,19 +91,8 @@ stringData:
   GIT_HOOK_SECRET: $(echo $RANDOM | md5sum | cut -d" " -f1)
 EOF
 ```
+
 - Cosign key
 ```shell
 cosign generate-key-pair k8s://openshift-pipelines/signing-secrets
-```
-
-## Configure the cicd chain
-
-Create the argoCD chain project
-```shell
-oc apply -f gitops/argocd/project.yaml
-```
-
-Create the argoCD Application
-```shell
-oc apply -f gitops/argocd/application.yaml
 ```
