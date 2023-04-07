@@ -54,15 +54,23 @@ oc apply -f gitops/argocd/application.yaml
 
 ## Post configuration
 
-Patch the service account to get access to the creds
+### Gitea configuration
 
-- Patch build-bot
-```shell
-oc patch serviceaccount build-bot \
-  -p "{\"imagePullSecrets\": [{\"name\": \"registry-credentials\"}]}" -n ${NAMESPACE}
-```
+At first we need to configure our gitea account and push a repository.
 
-- GITEA WEBHOOK SECRET
+Get the URL for the Gitea route:
+echo "https://$(oc get route gitea -o=jsonpath='{.spec.host}' -n gitea)"
+
+Connect to gitea using gitea and redhat123.
+
+At first we will create an Access Tokens to get access to the gitea API.
+
+On the top right select the gitea icons and click on settings. Then go in applications. Put gitea-bot-token as token name and click on Generate Token.
+
+![create repo](images/gitea-bot-token.png)
+
+Copy the generate token and create the following gitea secret:
+
 
 ```yaml
 cat <<EOF | oc apply -f -
@@ -73,8 +81,24 @@ metadata:
   namespace: cicd-devsec-ops
 type: Opaque
 stringData:
-  token: 8c879debf5e65c8b03180cb5b9b073531200e036
+  token: 43d1db62909b1346e34a95a48d1256498c2b108e
 EOF
+```
+
+Now on the top right click on the + and click on New repository. Give python-app as name, select Initialize Repository and keep other default parameters. Click on Create Repository. 
+
+Then click on settings > Collaborators and add Developer Collaborator with Administrator right.
+
+![create repo](images/add-developer.png)
+
+
+
+Patch the service account to get access to the creds
+
+- Patch build-bot
+```shell
+oc patch serviceaccount build-bot \
+  -p "{\"imagePullSecrets\": [{\"name\": \"registry-credentials\"}]}" -n ${NAMESPACE}
 ```
 
 - GITEA TOKEN
