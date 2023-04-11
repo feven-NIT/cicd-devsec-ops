@@ -14,6 +14,7 @@ oc apply -f gitops/ClusterRoleBinding.yaml
 ## Quay configuration and credentials setup
 
 In quay.io create a public repository, that will be used to store the image build by the pipeline.
+Update the file ./cicd-devsec-ops/gitops/base/pipeline/02_trigger-template.yaml to use the url of your new targeted repo instead of the default one.
 
 ![create repo](images/create-repo.png)
 

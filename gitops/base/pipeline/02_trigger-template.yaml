@@ -25,7 +25,7 @@ spec:
         - name: pr-number
           value: $(tt.params.pr-number)
         - name: IMAGE_REPO
-          value: "quay.io/feven/cicd-e2e" # TO update
+          value: "quay.io/feven/" # TO update
         - name: UI_BASE_PATH
           value: "https://console.openshift-console.svc.cluster.local/k8s/ns/cicd-devsec-ops/tekton.dev~v1beta1~Pipeline/clone-build-push/Runs"
         - name: GIT_REPO
