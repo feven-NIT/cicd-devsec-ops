@@ -59,7 +59,7 @@ oc apply -f gitops/argocd/application.yaml
 At first we need to configure our gitea account and push a repository.
 
 Get the URL for the Gitea route:
-echo "https://$(oc get route gitea -o=jsonpath='{.spec.host}' -n gitea)"
+GITEA_URL=$(echo "https://$(oc get route gitea -o=jsonpath='{.spec.host}' -n gitea)")
 
 Connect to gitea using gitea and redhat123.
 
@@ -85,11 +85,14 @@ stringData:
 EOF
 ```
 
-Now on the top right click on the + and click on New repository. Give python-app as name, select Initialize Repository and keep other default parameters. Click on Create Repository. 
+Now on the top right click on the + and click on New repository. Give python-app as name, and keep other default parameters. Click on Create Repository. 
 
 Then click on settings > Collaborators and add Developer Collaborator with Administrator right.
 
 ![create repo](images/add-developer.png)
+
+Then clone the following repo https://github.com/adrien-legros/openshift-pipelines-demo and change the remote origin
+git remote set-url origin $GITEA_URL/gitea/python-app.git 
 
 
 
@@ -100,6 +103,29 @@ Patch the service account to get access to the creds
 oc patch serviceaccount build-bot \
   -p "{\"imagePullSecrets\": [{\"name\": \"registry-credentials\"}]}" -n ${NAMESPACE}
 ```
+
+- GITEA TOKEN
+
+```yaml
+cat <<EOF | oc apply -f -
+apiVersion: v1
+kind: Secret
+metadata:
+  name: cicd-devsec-ops-githook-secret
+  namespace: cicd-devsec-ops
+type: Opaque
+stringData:
+  GIT_HOOK_SECRET: $(echo $RANDOM | md5sum | cut -d" " -f1)
+EOF
+```
+
+Get the GIT_HOOK_SECRET Genereated.
+
+
+
+Create webhook. Click on your application then go on setting > Webhooks and click on add Webhook. Then click on Gitea.
+
+In Target url put the url of the event listener and put the git_hook-secret generated previously.
 
 - GITEA TOKEN
 
