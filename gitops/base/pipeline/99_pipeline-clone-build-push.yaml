@@ -85,8 +85,7 @@ spec:
         - name: source
           workspace: tekton-pvc
         - name: dockerconfig
-          secret:
-            secretName: registry-credentials
+          workspace: dockerconfig
     # - name: kaniko
     #   params:
     #     - name: IMAGE
