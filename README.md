@@ -22,7 +22,7 @@ Then create a robot accound that will be used by the pipeline service account in
 
 Click on your username on the top left > Account settings > Robot Accounts > Create Robot Account > Provide a name for your bot > select the repo that we have create in the previous step > Select admin permission. 
 
-Then click on Robot Account and copy the username and the password. 
+Then click on Robot Account and Download credentials config
 
 
 ```shell
@@ -35,7 +35,7 @@ export NAMESPACE="cicd-devsec-ops"
 Create a namespace and the secret for the registry
 
 ```shell
-oc create secret  docker-registry registry-credentials  --docker-server=quay.io --docker-username=${USERNAME} --docker-email=${EMAIL} --docker-password=${QUAY_TOKEN} -n ${NAMESPACE}
+oc create secret generic registry-credentials --from-file=config.json
 ```
 
 In ./cicd-devsec-ops/gitops/base/gitea/gitea-server.yaml replace ROOT_URL with your correct base domain.
