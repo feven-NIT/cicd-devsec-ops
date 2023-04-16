@@ -103,7 +103,7 @@ spec:
     - name: sign-image
       params:
         - name: image
-          value: $(params.IMAGE_REPO)
+          value: '$(params.IMAGE_REPO)/$(params.GIT_REPO_NAME):$(params.GIT_REVISION)'
       runAfter:
         - s2i
       taskRef:
