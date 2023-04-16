@@ -37,10 +37,8 @@ spec:
       - name: regcred
         mountPath: /regcred
         readOnly: true
-      - name: host-root
-        mountPath: /host
-        readOnly: true
-        mountPropagation: shared
+      securityContext:
+        privileged: true
   volumes:
     - name: cosign-secret
       secret:
@@ -48,6 +46,3 @@ spec:
     - name: regcred
       secret:
         secretName: registry-credentials
-    - name: host-root
-      hostPath:
-        path: /
