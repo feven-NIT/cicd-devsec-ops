@@ -22,7 +22,7 @@ spec:
       args:
       - |
         # Load the registry credentials
-        podman login -u $(jq -r '.auths."quay.io".auth' /regcred/config.json | base64 -d | cut -d: -f1) -p $(jq -r '.auths."quay.io".auth' /regcred/config.json | base64 -d | cut -d: -f2) quay.io/feven
+        cosign login quay.io -u $(jq -r '.auths."quay.io".auth' /regcred/config.json | base64 -d | cut -d: -f1) -p $(jq -r '.auths."quay.io".auth' /regcred/config.json | base64 -d | cut -d: -f2)
 
         # Sign the image
         cosign sign --key  k8s://cicd-devsec-ops/cosign $(params.image) -y
