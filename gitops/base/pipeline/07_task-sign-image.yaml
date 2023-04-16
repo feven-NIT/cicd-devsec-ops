@@ -21,11 +21,8 @@ spec:
       - -c
       args:
       - |
-        # Load the Cosign secret
-        #cosign login -u $(jq -r '.auths."quay.io".auth' /regcred/.dockerconfigjson | base64 -d | cut -d: -f1) -p $(jq -r '.auths."quay.io".auth' /regcred/.dockerconfigjson | base64 -d | cut -d: -f2) quay.io
-
         # Load the registry credentials
-        podman login -u $(jq -r '.auths."quay.io".auth' /regcred/.dockerconfigjson | base64 -d | cut -d: -f1) -p $(jq -r '.auths."quay.io".auth' /regcred/.dockerconfigjson | base64 -d | cut -d: -f2) quay.io/feven
+        podman login -u $(jq -r '.auths."quay.io".auth' /regcred/config.json | base64 -d | cut -d: -f1) -p $(jq -r '.auths."quay.io".auth' /regcred/config.json | base64 -d | cut -d: -f2) quay.io/feven
 
         # Sign the image
         cosign sign --key  k8s://cicd-devsec-ops/cosign $(params.image) -y
@@ -46,4 +43,4 @@ spec:
         secretName: cosign
     - name: regcred
       secret:
-        secretName: regcred
+        secretName: registry-credentials

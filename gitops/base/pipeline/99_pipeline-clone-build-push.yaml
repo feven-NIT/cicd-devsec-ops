@@ -100,18 +100,18 @@ spec:
     #       workspace: tekton-pvc
     #     - name: dockerconfig
     #       workspace: dockerconfig
-    # - name: sign-image
-    #   params:
-    #     - name: image
-    #       value: $(params.IMAGE_REPO)
-    #   runAfter:
-    #     - kaniko
-    #   taskRef:
-    #     kind: Task
-    #     name: cosign
-    - name: image-check
+    - name: sign-image
+      params:
+        - name: image
+          value: $(params.IMAGE_REPO)
       runAfter:
         - s2i
+      taskRef:
+        kind: Task
+        name: cosign
+    - name: image-check
+      runAfter:
+        - sign-image
       taskRef:
         name: stackrox-image-check
         kind: Task
@@ -126,7 +126,7 @@ spec:
           value: "true"
     - name: image-scan
       runAfter:
-        - s2i
+        - sign-image
       taskRef:
         name: stackrox-image-scan
         kind: Task

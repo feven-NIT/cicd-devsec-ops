@@ -176,8 +176,8 @@ Copy the Api Token Integration and create the integration secret.
 
 ```shell
 ROX_API_TOKEN=YOURTOKEN
-GITEA_URL=$(echo "https://$(oc get route central -o=jsonpath='{.spec.host}' -n rhacs-operator)")
-cat > ./roxsecret.yaml << EOF
+ACS_ROUTE=$(echo "$(oc get route central -o=jsonpath='{.spec.host}' -n rhacs-operator)")
+cat > /tmp/roxsecret.yaml << EOF
 apiVersion: v1
 data:
   rox_api_token: "$(echo $ROX_API_TOKEN | tr -d '\n' | base64 -w 0)"
@@ -189,5 +189,13 @@ metadata:
 type: Opaque
 EOF
 
-oc apply -f ./roxsecret.yaml
+oc apply -f /tmp/roxsecret.yaml
 ```
+
+Toujours dans ACS passe la policy Fixable Severity at least Important de Enforce a Informative.
+
+
+
+Autres:
+
+Remplacer les reference a quay.io/feven par votre registry
