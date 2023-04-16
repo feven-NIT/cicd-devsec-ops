@@ -35,11 +35,17 @@ export NAMESPACE="cicd-devsec-ops"
 Create a namespace and the secret for the registry
 
 ```shell
-oc create secret generic registry-credentials --from-file=config.json
+oc create secret generic registry-credentials --from-file=config.json -n ${NAMESPACE}
 ```
 
-In ./cicd-devsec-ops/gitops/base/gitea/gitea-server.yaml replace ROOT_URL with your correct base domain.
-In ./cicd-devsec-ops/gitops/base/pipeline/02_trigger-template.yaml replace GITEA_HOST_URL with your your correct base domain
+Replace ROOT_URL with your correct base domain in :
+```shell
+./cicd-devsec-ops/gitops/base/gitea/gitea-server.yaml
+```
+And replace GITEA_HOST_URL with your correct base domain :
+```shell
+./cicd-devsec-ops/gitops/base/pipeline/02_trigger-template.yaml 
+```
 
 ## Configure the cicd chain
 
@@ -143,7 +149,45 @@ stringData:
 EOF
 ```
 
+
+### RHACS configuration
+
+Go in RHACS 
+
+```shell
+echo "https://$(oc get route central -o=jsonpath='{.spec.host}' -n rhacs-operator)"
+```
+
+Connect using admin as user and get password with the following command:
+
+```shell
+oc -n rhacs-operator get secret central-htpasswd -o go-template='{{index .data "password" | base64decode}}'
+```
+
 - Cosign key
 ```shell
 cosign generate-key-pair k8s://openshift-pipelines/signing-secrets
+```
+
+Go in platform configuration > Integrations and select api token.
+
+Click on Generate Token. Choose a token name and select continuous Integration as Role.
+Copy the Api Token Integration and create the integration secret.
+
+```shell
+ROX_API_TOKEN=YOURTOKEN
+GITEA_URL=$(echo "https://$(oc get route central -o=jsonpath='{.spec.host}' -n rhacs-operator)")
+cat > ./roxsecret.yaml << EOF
+apiVersion: v1
+data:
+  rox_api_token: "$(echo $ROX_API_TOKEN | tr -d '\n' | base64 -w 0)"
+  rox_central_endpoint: "$(echo $ACS_ROUTE:443 | tr -d '\n' | base64 -w 0)"
+kind: Secret
+metadata:
+  name: rox-api-token
+  namespace: ${NAMESPACE}
+type: Opaque
+EOF
+
+oc apply -f ./roxsecret.yaml
 ```
