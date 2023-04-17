@@ -47,6 +47,15 @@ And replace GITEA_HOST_URL with your correct base domain :
 ./cicd-devsec-ops/gitops/base/pipeline/02_trigger-template.yaml 
 ```
 
+Then replace quay.io/feven by the name of your own repo in
+```shell
+~/cicd-devsec-ops/gitops/base/pipeline/02_trigger-template.yaml
+```
+and
+```shell
+/home/feven/Desktop/SA/cicd-devsec-ops/gitops/base/pipeline/07_task-sign-image.yaml
+```
+
 ## Configure the cicd chain
 
 Create the argoCD chain project
@@ -66,7 +75,9 @@ oc apply -f gitops/argocd/application.yaml
 At first we need to configure our gitea account and push a repository.
 
 Get the URL for the Gitea route:
+```shell
 GITEA_URL=$(echo "https://$(oc get route gitea -o=jsonpath='{.spec.host}' -n gitea)")
+```
 
 Connect to gitea using gitea and redhat123.
 
@@ -191,11 +202,7 @@ EOF
 
 oc apply -f /tmp/roxsecret.yaml
 ```
-
 Toujours dans ACS passe la policy Fixable Severity at least Important de Enforce a Informative.
 
 
 
-Autres:
-
-Remplacer les reference a quay.io/feven par votre registry
