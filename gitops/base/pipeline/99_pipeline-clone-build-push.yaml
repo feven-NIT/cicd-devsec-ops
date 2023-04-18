@@ -80,7 +80,7 @@ spec:
         - pytest
       taskRef:
         kind: Task
-        name: s2i
+        name: build-and-sign
       workspaces:
         - name: source
           workspace: tekton-pvc
@@ -105,7 +105,7 @@ spec:
     #     - name: image
     #       value: '$(params.IMAGE_REPO)/$(params.GIT_REPO_NAME):$(params.GIT_REVISION)'
     #   runAfter:
-    #     - s2i
+    #     - build-and-sign
     #   taskRef:
     #     kind: Task
     #     name: cosign
@@ -117,7 +117,7 @@ spec:
         kind: Task
       params:
         - name: image
-          value: '$(params.IMAGE_REPO)/$(params.GIT_REPO_NAME)@$(tasks.s2i.results.IMAGE_DIGEST)'
+          value: '$(params.IMAGE_REPO)/$(params.GIT_REPO_NAME)@$(tasks.build-and-sign.results.IMAGE_DIGEST)'
         - name: rox_api_token
           value: rox-api-token
         - name: rox_central_endpoint
@@ -135,7 +135,7 @@ spec:
       #     workspace: tekton-pvc
       params:
         - name: image
-          value: '$(params.IMAGE_REPO)/$(params.GIT_REPO_NAME)@$(tasks.s2i.results.IMAGE_DIGEST)'
+          value: '$(params.IMAGE_REPO)/$(params.GIT_REPO_NAME)@$(tasks.build-and-sign.results.IMAGE_DIGEST)'
         - name: rox_api_token
           value: rox-api-token
         - name: rox_central_endpoint
@@ -149,7 +149,7 @@ spec:
         - name: SCRIPT
           value: >
             oc new-app --docker-image
-            $(params.IMAGE_REPO)/$(params.GIT_REPO_NAME)@$(tasks.s2i.results.IMAGE_DIGEST)
+            $(params.IMAGE_REPO)/$(params.GIT_REPO_NAME)@$(tasks.build-and-sign.results.IMAGE_DIGEST)
             --name $(params.GIT_REPO_NAME)
 
             oc wait --for=condition=available --timeout=60s
