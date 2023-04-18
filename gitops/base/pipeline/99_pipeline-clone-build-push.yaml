@@ -64,7 +64,7 @@ spec:
       workspaces:
         - name: source
           workspace: tekton-pvc
-    - name: s2i
+    - name: Build and sign image
       params:
         - name: VERSION
           value: latest
@@ -100,15 +100,15 @@ spec:
     #       workspace: tekton-pvc
     #     - name: dockerconfig
     #       workspace: dockerconfig
-    - name: sign-image
-      params:
-        - name: image
-          value: '$(params.IMAGE_REPO)/$(params.GIT_REPO_NAME):$(params.GIT_REVISION)'
-      runAfter:
-        - s2i
-      taskRef:
-        kind: Task
-        name: cosign
+    # - name: sign-image
+    #   params:
+    #     - name: image
+    #       value: '$(params.IMAGE_REPO)/$(params.GIT_REPO_NAME):$(params.GIT_REVISION)'
+    #   runAfter:
+    #     - s2i
+    #   taskRef:
+    #     kind: Task
+    #     name: cosign
     - name: image-check
       runAfter:
         - sign-image

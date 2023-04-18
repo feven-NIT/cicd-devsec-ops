@@ -176,6 +176,7 @@ oc -n rhacs-operator get secret central-htpasswd -o go-template='{{index .data "
 ```
 
 - Cosign key
+
 ```shell
 cosign generate-key-pair k8s://openshift-pipelines/signing-secrets
 ```
@@ -204,5 +205,77 @@ oc apply -f /tmp/roxsecret.yaml
 ```
 Toujours dans ACS passe la policy Fixable Severity at least Important de Enforce a Informative.
 
+
+## Quay and cosign integration
+
+At first we need to allow scan of quay image in ACS:
+
+Then we will create a task that gonna use ACS api to check that the image is signed. 
+
+To do that go in the ACS GUI > Integrations > Quay.io > New integration and provide the quay.io credentials that has been generated previously :
+
+![quay integration](images/quayIntegration.png)
+
+Then we will add the cosign publickey in rhacs to allow the checking
+
+Go in integrations signature and provide the key value.
+
+![signature integration](images/signature-integration.png)
+
+Then we need to create a stackrox policy that will check sigstore signature.
+
+Go in Policy Management > Import policy and paste the following json file
+
+```shell
+{
+    "policies": [
+        {
+            "id": "c8fde2c3-980c-40e3-bc9d-6245b13ab81e",
+            "name": "Trusted_Signature_Image_Policy",
+            "description": "Alert on Images that have not been signed",
+            "rationale": "rationale",
+            "remediation": "All images should be signed by our cosign-demo signature",
+            "disabled": false,
+            "categories": [
+                "Security Best Practices"
+            ],
+            "lifecycleStages": [
+                "BUILD",
+                "DEPLOY"
+            ],
+            "severity": "HIGH_SEVERITY",
+            "enforcementActions": [],
+            "notifiers": [],
+            "SORTName": "",
+            "SORTLifecycleStage": "",
+            "SORTEnforcement": true,
+            "policyVersion": "1.1",
+            "policySections": [
+                {
+                    "sectionName": "Policy Section 1",
+                    "policyGroups": [
+                        {
+                            "fieldName": "Image Signature Verified By",
+                            "booleanOperator": "OR",
+                            "negate": false,
+                            "values": [
+                                {
+                                    "value": "io.stackrox.signatureintegration.f9352803-d5c9-45d6-abe0-e1361a24559a"
+                                }
+                            ]
+                        }
+                    ]
+                }
+            ],
+            "mitreAttackVectors": [],
+            "criteriaLocked": false,
+            "mitreVectorsLocked": false,
+            "isDefault": false
+        }
+    ]
+}
+```
+
+Click on begin import
 
 
