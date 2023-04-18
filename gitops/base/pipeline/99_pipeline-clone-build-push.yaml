@@ -80,7 +80,7 @@ spec:
         - pytest
       taskRef:
         kind: Task
-        name: build-and-sign
+        name: s2i
       workspaces:
         - name: source
           workspace: tekton-pvc

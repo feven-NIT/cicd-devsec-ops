@@ -109,7 +109,13 @@ Then click on settings > Collaborators and add Developer Collaborator with Admin
 ![create repo](images/add-developer.png)
 
 Then clone the following repo https://github.com/adrien-legros/openshift-pipelines-demo and change the remote origin
-git remote set-url origin $GITEA_URL/gitea/python-app.git 
+```shell
+git remote set-url origin $GITEA_URL/gitea/python-app.git
+git add --all
+git commit -m "init repo in gitea"
+git push
+#use gitea redhat123
+```
 
 
 
@@ -138,27 +144,21 @@ EOF
 
 Get the GIT_HOOK_SECRET Genereated.
 
+```shell
+oc get secret cicd-devsec-ops-githook-secret -n cicd-devsec-ops -oyaml | grep stringData
+```
+
 
 
 Create webhook. Click on your application then go on setting > Webhooks and click on add Webhook. Then click on Gitea.
 
-In Target url put the url of the event listener and put the git_hook-secret generated previously.
-
-- GITEA TOKEN
-
-```yaml
-cat <<EOF | oc apply -f -
-apiVersion: v1
-kind: Secret
-metadata:
-  name: cicd-devsec-ops-githook-secret
-  namespace: cicd-devsec-ops
-type: Opaque
-stringData:
-  GIT_HOOK_SECRET: $(echo $RANDOM | md5sum | cut -d" " -f1)
-EOF
+In Target url put the url of the event listener 
+```shell
+echo "https://$(oc get route el-cicd-devsec-ops-listener -o=jsonpath='{.spec.host}' -n cicd-devsec-ops)"
 ```
+and put the git_hook_secret generated previously.
 
+In trigger On select Custom Events and click on Pull Request. Finally click on Add Webhook
 
 ### RHACS configuration
 
@@ -174,19 +174,13 @@ Connect using admin as user and get password with the following command:
 oc -n rhacs-operator get secret central-htpasswd -o go-template='{{index .data "password" | base64decode}}'
 ```
 
-- Cosign key
-
-```shell
-cosign generate-key-pair k8s://openshift-pipelines/signing-secrets
-```
-
 Go in platform configuration > Integrations and select api token.
 
 Click on Generate Token. Choose a token name and select continuous Integration as Role.
 Copy the Api Token Integration and create the integration secret.
 
 ```shell
-ROX_API_TOKEN=YOURTOKEN
+ROX_API_TOKEN=<YOURTOKEN>
 ACS_ROUTE=$(echo "$(oc get route central -o=jsonpath='{.spec.host}' -n rhacs-operator)")
 cat > /tmp/roxsecret.yaml << EOF
 apiVersion: v1
@@ -215,7 +209,17 @@ To do that go in the ACS GUI > Integrations > Quay.io > New integration and prov
 
 ![quay integration](images/quayIntegration.png)
 
-Then we will add the cosign publickey in rhacs to allow the checking
+Then we will add the cosign publickey in rhacs to allow the checking.
+
+Create a cosign key
+
+```shell
+cosign generate-key-pair k8s://openshift-pipelines/signing-secrets
+```
+Get the public key
+```shell
+oc -n openshift-pipelines get secret signing-secrets -o go-template='{{index .data "cosign.pub" | base64decode}}'
+```
 
 Go in integrations signature and provide the key value.
 
@@ -276,5 +280,19 @@ Go in Policy Management > Import policy and paste the following json file
 ```
 
 Click on begin import
+
+# Triger the pipeline
+
+Now You can trigger the pipeline 
+To do that go in gitea and log with the user developer redhat123. 
+You should see the repo python-app.
+Click on Fork on the top right and select Fork Repository.
+Click on it and go in app.py and click on edit file.
+Replace random_string by hello instead of e and click on commit changes.
+Nos click on Pull Requests > New Pull Request.
+On The left select merge into: gitea:main.
+Click on New Pull Request.
+Then you should see in openshift that the pipeline as been triggered
+
 
 
