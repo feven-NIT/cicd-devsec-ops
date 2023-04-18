@@ -8,7 +8,7 @@ resources:
   - ./pipeline/04_task-fetch-source.yaml
   - ./pipeline/05_task-pytest.yaml
   - ./pipeline/06_task-s2i.yaml
-  - ./pipeline/07_task-sign-image.yaml
+  # - ./pipeline/07_task-sign-image.yaml
   - ./pipeline/08_task-image-check.yaml
   - ./pipeline/09_task-image-scan.yaml
   - ./pipeline/10_task-openshift-client.yaml
