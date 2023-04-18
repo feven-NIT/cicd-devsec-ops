@@ -64,7 +64,7 @@ spec:
       workspaces:
         - name: source
           workspace: tekton-pvc
-    - name: Build-and-sign-image
+    - name: build-and-sign
       params:
         - name: VERSION
           value: latest
