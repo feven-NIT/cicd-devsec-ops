@@ -19,8 +19,8 @@ resources:
 
   - ./rbac/build-bot.yaml
 
-  - ./tektonchains/tektonchain.yaml
-  - ./tektonchains/config.yaml
+  # - ./tektonchains/tektonchain.yaml
+  # - ./tektonchains/config.yaml
 
   #- ./vault/hashicorp.yaml
 
