@@ -291,7 +291,7 @@ Click on it and go in app.py and click on edit file.
 Replace random_string by hello instead of e and click on commit changes.
 Nos click on Pull Requests > New Pull Request.
 On The left select merge into: gitea:main.
-Click on New Pull Request.
+Click on New Pull Request> Create Pull Request.
 Then you should see in openshift that the pipeline as been triggered
 
 
