@@ -37,7 +37,7 @@ spec:
         - name: GIT_REPO_FULL_NAME
           value: $(tt.params.GIT_REPO_FULL_NAME)
         - name: GITEA_HOST_URL
-          value: "gitea-gitea.apps.cluster-dp8f2.dp8f2.sandbox2869.opentlc.com" # Base Domain to update
+          value: "gitea-gitea.apps.cluster-t8pdl.t8pdl.sandbox3014.opentlc.com" # Base Domain to update
         - name: GITEA_HTTPS_OR_HTTP
           value: https
         - name: GITEA_TOKEN_SECRET_NAME
