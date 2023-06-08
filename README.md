@@ -55,6 +55,15 @@ and
 /home/feven/Desktop/SA/cicd-devsec-ops/gitops/base/pipeline/07_task-sign-image.yaml
 ```
 
+Push your update in the current repo
+
+```shell
+git add --all
+git commit -m "update path"
+git push
+```
+
+
 ## Configure the cicd chain
 
 Create the argoCD chain project
